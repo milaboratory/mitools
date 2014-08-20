@@ -1,0 +1,11 @@
+package com.milaboratory.mitools.cli;
+
+import com.beust.jcommander.Parameter;
+
+public abstract class ActionParameters {
+    @Parameter(names = {"-h", "--help"}, help = true, description = "Displays help for this command.")
+    public Boolean help;
+
+    public void validate() {
+    }
+}
