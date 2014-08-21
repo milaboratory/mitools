@@ -15,51 +15,53 @@ import static com.milaboratory.core.sequence.SequencesUtils.mismatchCount;
 import static java.lang.Math.*;
 
 public final class MismatchOnlyPairedReadMerger implements Processor<PairedRead, PairedReadMergingResult> {
-    public static final int DEFAULT_MAX_SCORE_VALUE = 55;
+    public static final int DEFAULT_MAX_SCORE_VALUE = 45;
     final int minOverlap;
-    final int maxMismatches;
-    final int motifLength;
+    final double maxMismatchesPart;
     final int maxScoreValue;
     // opposite reads direction or collinear
     final boolean isOpposite;
+    final int motifLength;
+    final int maxMismatchesInMotif;
 
     /**
      * Creates paired-end reads merger for Illumina (or other opposite reads) data.
      *
      * @param minOverlap    minimal number of nucleotide in overlap region
-     * @param maxMismatches maximal allowed number of mismatches in overlap region
+     * @param maxMismatchesPart maximal allowed percent of mismatches in overlap region
      */
-    public MismatchOnlyPairedReadMerger(int minOverlap, int maxMismatches) {
-        this(minOverlap, maxMismatches, DEFAULT_MAX_SCORE_VALUE, true);
+    public MismatchOnlyPairedReadMerger(int minOverlap, double maxMismatchesPart) {
+        this(minOverlap, maxMismatchesPart, DEFAULT_MAX_SCORE_VALUE, true);
     }
 
     /**
      * Creates paired-end reads merger for Illumina (or other opposite reads) data.
      *
      * @param minOverlap    minimal number of nucleotide in overlap region
-     * @param maxMismatches maximal allowed number of mismatches in overlap region
+     * @param maxMismatchesPart maximal allowed percent of mismatches in overlap region
      * @param maxScoreValue maximal output quality score value
      */
-    public MismatchOnlyPairedReadMerger(int minOverlap, int maxMismatches, int maxScoreValue) {
-        this(minOverlap, maxMismatches, maxScoreValue, true);
+    public MismatchOnlyPairedReadMerger(int minOverlap, double maxMismatchesPart, int maxScoreValue) {
+        this(minOverlap, maxMismatchesPart, maxScoreValue, true);
     }
 
     /**
      * Creates paired-end reads merger.
      *
      * @param minOverlap    minimal number of nucleotide in overlap region
-     * @param maxMismatches maximal allowed number of mismatches in overlap region
+     * @param maxMismatchesPart maximal allowed percent of mismatches in overlap region
      * @param maxScoreValue maximal output quality score value
      * @param isOpposite    {@code true} if reads are on different strands, like Illumina reads
      */
-    public MismatchOnlyPairedReadMerger(int minOverlap, int maxMismatches, int maxScoreValue, boolean isOpposite) {
+    public MismatchOnlyPairedReadMerger(int minOverlap, double maxMismatchesPart, int maxScoreValue, boolean isOpposite) {
         this.minOverlap = minOverlap;
-        this.maxMismatches = maxMismatches;
+        this.maxMismatchesPart = maxMismatchesPart;
         this.isOpposite = isOpposite;
         this.maxScoreValue = maxScoreValue;
 
         // Calculating length fo motif to be used in Bitap search.
         this.motifLength = min(minOverlap, 62);
+        this.maxMismatchesInMotif = (int) round(motifLength * maxMismatchesPart);
     }
 
     @Override
@@ -94,7 +96,7 @@ public final class MismatchOnlyPairedReadMerger implements Processor<PairedRead,
                 motifLength
         );
         BitapPattern bitapPattern = motif.toBitapPattern();
-        BitapMatcher bitapMatcher = bitapPattern.substitutionOnlyMatcherFirst(maxMismatches, read1.getSequence());
+        BitapMatcher bitapMatcher = bitapPattern.substitutionOnlyMatcherFirst(maxMismatchesInMotif, read1.getSequence());
 
         int matchPosition, mismatches, overlap;
 
@@ -107,7 +109,7 @@ public final class MismatchOnlyPairedReadMerger implements Processor<PairedRead,
             if ((mismatches = mismatchCount(
                     read1.getSequence(), matchPosition,
                     read2.getSequence(), 0,
-                    overlap)) <= maxMismatches)
+                    overlap)) <= overlap * maxMismatchesPart)
                 return new PairedReadMergingResult(pairedRead, overlap(read1, read2, matchPosition),
                         overlap, mismatches);
 
@@ -117,7 +119,7 @@ public final class MismatchOnlyPairedReadMerger implements Processor<PairedRead,
             if ((mismatches = mismatchCount(
                     read1.getSequence(), matchPosition - overlap,
                     read2.getSequence(), max(0, read2.size() - overlap),
-                    overlap)) <= maxMismatches)
+                    overlap)) <= overlap * maxMismatchesPart)
                 return new PairedReadMergingResult(pairedRead, overlap(read1, read2, min(matchPosition - read2.size(), 0)),
                         overlap, mismatches);
         }
@@ -164,7 +166,7 @@ public final class MismatchOnlyPairedReadMerger implements Processor<PairedRead,
                     letter = l;
                     quality = q;
                 } else if (letter == l)
-                    quality = (byte) Math.max(maxScoreValue, quality + q);
+                    quality = (byte) min(maxScoreValue, quality + q);
                 else if (q > quality) {
                     letter = l;
                     quality = q;

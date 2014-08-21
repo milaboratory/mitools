@@ -4,11 +4,26 @@ import com.beust.jcommander.IParameterValidator;
 import com.beust.jcommander.IStringConverter;
 import com.beust.jcommander.IValueValidator;
 import com.beust.jcommander.ParameterException;
+import com.milaboratory.core.io.sequence.fastq.SingleFastqReader;
+import com.milaboratory.core.io.sequence.fastq.SingleFastqWriter;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 public class Util {
+    public static SingleFastqWriter createSingleWriter(String fileName) throws IOException {
+        if (fileName.equals("-"))
+            return new SingleFastqWriter(System.out);
+        return new SingleFastqWriter(fileName);
+    }
+
+    public static SingleFastqReader createSingleReader(String fileName) throws IOException {
+        if (fileName.equals("-"))
+            return new SingleFastqReader(System.in);
+        return new SingleFastqReader(fileName);
+    }
+
     public static class FileConverter implements IStringConverter<File> {
         @Override
         public File convert(String value) {

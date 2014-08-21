@@ -31,13 +31,11 @@ public class MergeAction implements Action {
     @Override
     public void go() throws Exception {
         final MismatchOnlyPairedReadMerger merger = new MismatchOnlyPairedReadMerger(actionParameters.overlap,
-                actionParameters.mismatches);
-
-        boolean stdout = actionParameters.getOutput().equals("-");
+                1.0 - actionParameters.similarity);
 
         long total = 0, overlapped = 0;
         try (PairedFastqReader reader = new PairedFastqReader(actionParameters.getR1(), actionParameters.getR2());
-             SingleFastqWriter mainWriter = new SingleFastqWriter(actionParameters.getOutput());
+             SingleFastqWriter mainWriter = Util.createSingleWriter(actionParameters.getOutput());
              SingleFastqWriter nfWriter = actionParameters.forwardNegative == null ?
                      null : new SingleFastqWriter(actionParameters.forwardNegative);
              SingleFastqWriter nrWriter = actionParameters.reverseNegative == null ?
@@ -103,19 +101,18 @@ public class MergeAction implements Action {
         return actionParameters;
     }
 
-    @Parameters(commandDescription = "Builds alignments with V,D,J and C genes for input sequencing reads.",
-            optionPrefixes = "-")
+    @Parameters(commandDescription = "Merges reads.", optionPrefixes = "-")
     public static final class MergingParameters extends ActionParameters {
         @Parameter(description = "input_file_R1.fastq(.gz) input_file_R2.fastq(.gz) (-|output_file.fastq(.gz))", variableArity = true)
         public List<String> parameters = new ArrayList<>();
 
-        @Parameter(description = "{not supported} FASTQ file to put non-overlapped forward reads (supported formats: " +
+        @Parameter(description = "FASTQ file to put non-overlapped forward reads (supported formats: " +
                 "*.fastq and *.fastq.gz).",
                 names = {"-nf", "--negative-forward"},
                 converter = Util.FileConverter.class)
         File forwardNegative;
 
-        @Parameter(description = "{not supported} FASTQ file to put non-overlapped reverse reads (supported formats: " +
+        @Parameter(description = "FASTQ file to put non-overlapped reverse reads (supported formats: " +
                 "*.fastq and *.fastq.gz).",
                 names = {"-nr", "--negative-reverse"},
                 converter = Util.FileConverter.class)
@@ -143,9 +140,9 @@ public class MergeAction implements Action {
                 names = {"-p", "--overlap"}, validateWith = PositiveInteger.class)
         int overlap = 15;
 
-        @Parameter(description = "Number of allowed mismatches",
-                names = {"-m", "--mismatches"}, validateWith = PositiveInteger.class)
-        int mismatches = 2;
+        @Parameter(description = "Minimal allowed similarity",
+                names = {"-s", "--similarity"})
+        double similarity = 0.85;
 
         @Parameter(description = "Threads",
                 names = {"-t", "--threads"}, validateWith = PositiveInteger.class)
@@ -165,8 +162,8 @@ public class MergeAction implements Action {
 
         @Override
         public void validate() {
-            if (parameters.size() > 3)
-                throw new ParameterException("Too many input files.");
+            if (parameters.size() != 3)
+                throw new ParameterException("Wrong number of parameters.");
         }
     }
 }
