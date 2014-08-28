@@ -12,6 +12,10 @@ import com.milaboratory.core.io.sequence.PairedRead;
 import com.milaboratory.core.io.sequence.SingleReadImpl;
 import com.milaboratory.core.io.sequence.fastq.PairedFastqReader;
 import com.milaboratory.core.io.sequence.fastq.SingleFastqWriter;
+import com.milaboratory.mitools.com.milaboratory.cli.Action;
+import com.milaboratory.mitools.com.milaboratory.cli.ActionHelper;
+import com.milaboratory.mitools.com.milaboratory.cli.ActionParameters;
+import com.milaboratory.mitools.com.milaboratory.cli.Util;
 import com.milaboratory.mitools.merger.MismatchOnlyPairedReadMerger;
 import com.milaboratory.mitools.merger.PairedReadMergingResult;
 import com.milaboratory.util.SmartProgressReporter;
@@ -29,7 +33,7 @@ public class MergeAction implements Action {
     final MergingParameters actionParameters = new MergingParameters();
 
     @Override
-    public void go() throws Exception {
+    public void go(ActionHelper helper) throws Exception {
         final MismatchOnlyPairedReadMerger merger = new MismatchOnlyPairedReadMerger(actionParameters.overlap,
                 1.0 - actionParameters.similarity);
 
@@ -101,9 +105,9 @@ public class MergeAction implements Action {
         return actionParameters;
     }
 
-    @Parameters(commandDescription = "Merges reads.", optionPrefixes = "-")
+    @Parameters(commandDescription = "Merge overlapping paired-end reads.", optionPrefixes = "-")
     public static final class MergingParameters extends ActionParameters {
-        @Parameter(description = "input_file_R1.fastq(.gz) input_file_R2.fastq(.gz) (-|output_file.fastq(.gz))", variableArity = true)
+        @Parameter(description = "input_file_R1.fastq[.gz] input_file_R2.fastq[.gz] -|output_file.fastq[.gz]", variableArity = true)
         public List<String> parameters = new ArrayList<>();
 
         @Parameter(description = "FASTQ file to put non-overlapped forward reads (supported formats: " +

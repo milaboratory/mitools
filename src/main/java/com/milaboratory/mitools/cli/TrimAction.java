@@ -10,6 +10,10 @@ import com.beust.jcommander.validators.PositiveInteger;
 import com.milaboratory.core.io.sequence.SingleRead;
 import com.milaboratory.core.io.sequence.fastq.SingleFastqReader;
 import com.milaboratory.core.io.sequence.fastq.SingleFastqWriter;
+import com.milaboratory.mitools.com.milaboratory.cli.Action;
+import com.milaboratory.mitools.com.milaboratory.cli.ActionHelper;
+import com.milaboratory.mitools.com.milaboratory.cli.ActionParameters;
+import com.milaboratory.mitools.com.milaboratory.cli.Util;
 import com.milaboratory.mitools.trimmer.ReadLengthFilter;
 import com.milaboratory.mitools.trimmer.SequenceTrimmer;
 import com.milaboratory.util.SmartProgressReporter;
@@ -27,7 +31,7 @@ public class TrimAction implements Action {
     final TrimParameters actionParameters = new TrimParameters();
 
     @Override
-    public void go() throws Exception {
+    public void go(ActionHelper helper) throws Exception {
         try (SingleFastqReader reader = Util.createSingleReader(actionParameters.getInput());
              SingleFastqWriter writer = Util.createSingleWriter(actionParameters.getOutput())) {
             SmartProgressReporter.startProgressReport("Trimming", reader);
@@ -78,7 +82,7 @@ public class TrimAction implements Action {
 
     @Parameters(commandDescription = "Trim low quality ends of reads.", optionPrefixes = "-")
     private final static class TrimParameters extends ActionParameters {
-        @Parameter(description = "input_file.fastq(.gz) (-|output_file.fastq(.gz))", variableArity = true)
+        @Parameter(description = "input_file.fastq[.gz] -|output_file.fastq[.gz]", variableArity = true)
         public List<String> parameters = new ArrayList<>();
 
         @Parameter(description = "Trim left", names = {"-tl", "--left"})

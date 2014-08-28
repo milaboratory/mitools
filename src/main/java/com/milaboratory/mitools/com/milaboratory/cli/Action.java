@@ -1,10 +1,10 @@
-package com.milaboratory.mitools.cli;
+package com.milaboratory.mitools.com.milaboratory.cli;
 
 /**
  * Created by dbolotin on 20/08/14.
  */
 public interface Action {
-    void go() throws Exception;
+    void go(ActionHelper helper) throws Exception;
 
     String command();
 

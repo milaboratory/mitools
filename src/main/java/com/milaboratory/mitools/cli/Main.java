@@ -1,8 +1,10 @@
 package com.milaboratory.mitools.cli;
 
+import com.milaboratory.mitools.com.milaboratory.cli.JCommanderBasedMain;
+
 public class Main {
     public static void main(String[] args) throws Exception {
-        JCommanderMain main = new JCommanderMain("mitools", new MergeAction(), new TrimAction());
+        JCommanderBasedMain main = new JCommanderBasedMain("mitools", new MergeAction(), new TrimAction());
         main.main(args);
     }
 }
