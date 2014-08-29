@@ -4,4 +4,6 @@ import java.io.PrintStream;
 
 public interface ActionHelper {
     PrintStream getDefaultPrintStream();
+
+    String getCommandLineArguments();
 }

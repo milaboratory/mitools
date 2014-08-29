@@ -15,6 +15,7 @@ public class JCommanderBasedMain implements ActionHelper {
     protected final String command;
     protected boolean printHelpOnError = false;
     protected PrintStream outputStream = System.err;
+    protected String[] arguments;
 
     public JCommanderBasedMain(String command, Action... actions) {
         this.command = command;
@@ -31,11 +32,25 @@ public class JCommanderBasedMain implements ActionHelper {
         return outputStream;
     }
 
+    @Override
+    public String getCommandLineArguments() {
+        StringBuilder builder = new StringBuilder();
+        for (String arg : arguments) {
+            if (builder.length() != 0)
+                builder.append(" ");
+            builder.append(arg);
+        }
+        return builder.toString();
+    }
+
     protected void reg(Action a) {
         actions.put(a.command(), a);
     }
 
     public void main(String... args) throws Exception {
+        // Saving current arguments
+        this.arguments = args;
+
         // Setting up JCommander
         MainParameters mainParameters = new MainParameters();
         JCommander commander = new JCommander(mainParameters);
