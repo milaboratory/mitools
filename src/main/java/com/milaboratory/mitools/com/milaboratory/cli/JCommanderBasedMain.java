@@ -72,8 +72,14 @@ public class JCommanderBasedMain implements ActionHelper {
 
                 // Print complete help if requested
                 if (mainParameters.help()) {
+                    // Creating new instance of jCommander to add only non-hidden actions
+                    JCommander tmpCommander = new JCommander(mainParameters);
+                    tmpCommander.setProgramName(command);
+                    for (Action a : actions.values())
+                        if (!a.getClass().isAnnotationPresent(HiddenAction.class))
+                            tmpCommander.addCommand(a.command(), a.params());
                     StringBuilder builder = new StringBuilder();
-                    commander.usage(builder);
+                    tmpCommander.usage(builder);
                     outputStream.print(builder);
                     return;
                 }
@@ -118,7 +124,8 @@ public class JCommanderBasedMain implements ActionHelper {
     protected void printException(ParameterException e,
                                   JCommander commander, Action action) {
         outputStream.println("Error: " + e.getMessage());
-        printActionHelp(commander, action);
+        if (printHelpOnError)
+            printActionHelp(commander, action);
     }
 
     public static final class MainParameters {
