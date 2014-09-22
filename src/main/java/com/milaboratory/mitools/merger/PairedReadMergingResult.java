@@ -4,6 +4,9 @@ import com.milaboratory.core.io.sequence.PairedRead;
 import com.milaboratory.core.sequence.NSequenceWithQuality;
 
 public class PairedReadMergingResult {
+    private static final int MATCH_SCORE = 2;
+    private static final int MISMATCH_SCORE = -5;
+
     final PairedRead originalRead;
     final NSequenceWithQuality overlappedSequence;
     final int overlap;
@@ -55,5 +58,9 @@ public class PairedReadMergingResult {
 
     public int getErrors() {
         return errors;
+    }
+
+    int score() {
+        return (overlap - errors) * MATCH_SCORE + errors * MISMATCH_SCORE;
     }
 }

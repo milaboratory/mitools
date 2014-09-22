@@ -96,10 +96,22 @@ public class MismatchOnlyPairedReadMergerTest {
 
     public static void mAssert(String seq1, String seq2, int maxMuts, int overlap,
                                String expectedSequence, String expectedQuality) {
-        MismatchOnlyPairedReadMerger merger = new MismatchOnlyPairedReadMerger(overlap, 1.0 * maxMuts / overlap, 55, false);
+        MismatchOnlyPairedReadMerger merger = new MismatchOnlyPairedReadMerger(overlap, 1.0 - 1.0 * maxMuts / overlap, 55, false);
         PairedReadMergingResult processed = merger.process(new PairedRead(
                 new SingleReadImpl(0, new NSequenceWithQuality(seq1, lets('A', seq1.length())), "A"),
                 new SingleReadImpl(0, new NSequenceWithQuality(seq2, lets('B', seq2.length())), "B")));
+        if (expectedSequence == null)
+            Assert.assertFalse(processed.isSuccessful());
+        else {
+            Assert.assertTrue(processed.isSuccessful());
+            Assert.assertEquals(expectedSequence, processed.getOverlappedSequence().getSequence().toString());
+            Assert.assertEquals(expectedQuality, processed.getOverlappedSequence().getQuality().toString());
+        }
+
+        merger = new MismatchOnlyPairedReadMerger(overlap, 1.0 - 1.0 * maxMuts / overlap, 55, null);
+        processed = merger.process(new PairedRead(
+                new SingleReadImpl(0, new NSequenceWithQuality(seq1, lets('A', seq1.length())), "A"),
+                new SingleReadImpl(0, new NSequenceWithQuality(seq2, lets('B', seq2.length())).getReverseComplement(), "B")));
         if (expectedSequence == null)
             Assert.assertFalse(processed.isSuccessful());
         else {

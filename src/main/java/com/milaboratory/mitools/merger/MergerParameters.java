@@ -13,44 +13,23 @@ import com.milaboratory.primitivio.annotations.Serializable;
         getterVisibility = JsonAutoDetect.Visibility.NONE)
 @Serializable(asJson = true)
 public final class MergerParameters {
-    final int overlappingCount;
+    final int minimalOverlap;
     final double minimalIdentity;
-    final int maxScoreValue;
-    final Boolean isOpposite;
-
-    public MergerParameters(
-            int overlappingCount,
-            double minimalIdentity,
-            Boolean isOpposite) {
-        this(overlappingCount, minimalIdentity, MismatchOnlyPairedReadMerger.DEFAULT_MAX_SCORE_VALUE, isOpposite);
-    }
 
     @JsonCreator
     public MergerParameters(
-            @JsonProperty("overlappingCount") int overlappingCount,
-            @JsonProperty("minimalIdentity") double minimalIdentity,
-            @JsonProperty("maxScoreValue") int maxScoreValue,
-            @JsonProperty("isOpposite") Boolean isOpposite) {
-        this.overlappingCount = overlappingCount;
+            @JsonProperty("minimalOverlap") int minimalOverlap,
+            @JsonProperty("minimalIdentity") double minimalIdentity) {
+        this.minimalOverlap = minimalOverlap;
         this.minimalIdentity = minimalIdentity;
-        this.maxScoreValue = maxScoreValue;
-        this.isOpposite = isOpposite;
     }
 
-    public int getOverlappingCount() {
-        return overlappingCount;
+    public int getMinimalOverlap() {
+        return minimalOverlap;
     }
 
     public double getMinimalIdentity() {
         return minimalIdentity;
-    }
-
-    public int getMaxScoreValue() {
-        return maxScoreValue;
-    }
-
-    public Boolean getIsOpposite() {
-        return isOpposite;
     }
 
     @Override
@@ -60,10 +39,8 @@ public final class MergerParameters {
 
         MergerParameters that = (MergerParameters) o;
 
-        if (maxScoreValue != that.maxScoreValue) return false;
         if (Double.compare(that.minimalIdentity, minimalIdentity) != 0) return false;
-        if (overlappingCount != that.overlappingCount) return false;
-        if (isOpposite != null ? !isOpposite.equals(that.isOpposite) : that.isOpposite != null) return false;
+        if (minimalOverlap != that.minimalOverlap) return false;
 
         return true;
     }
@@ -72,11 +49,9 @@ public final class MergerParameters {
     public int hashCode() {
         int result;
         long temp;
-        result = overlappingCount;
+        result = minimalOverlap;
         temp = Double.doubleToLongBits(minimalIdentity);
         result = 31 * result + (int) (temp ^ (temp >>> 32));
-        result = 31 * result + maxScoreValue;
-        result = 31 * result + (isOpposite != null ? isOpposite.hashCode() : 0);
         return result;
     }
 }

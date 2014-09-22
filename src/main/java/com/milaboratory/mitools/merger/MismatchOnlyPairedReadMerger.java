@@ -20,7 +20,7 @@ public final class MismatchOnlyPairedReadMerger implements Processor<PairedRead,
     final double maxMismatchesPart;
     final int maxScoreValue;
     // opposite reads direction or collinear
-    final boolean isOpposite;
+    final boolean[] strands;
     final int motifLength;
     final int maxMismatchesInMotif;
 
@@ -37,12 +37,31 @@ public final class MismatchOnlyPairedReadMerger implements Processor<PairedRead,
     /**
      * Creates paired-end reads merger for Illumina (or other opposite reads) data.
      *
+     * @param parameters merger parameters
+     */
+    public MismatchOnlyPairedReadMerger(MergerParameters parameters) {
+        this(parameters.getMinimalOverlap(), parameters.getMinimalIdentity(), DEFAULT_MAX_SCORE_VALUE, true);
+    }
+
+    /**
+     * Creates paired-end reads merger for Illumina (or other opposite reads) data.
+     *
      * @param minOverlap      minimal number of nucleotide in overlap region
      * @param minimalIdentity maximal allowed percent of mismatches in overlap region
      * @param maxScoreValue   maximal output quality score value
      */
     public MismatchOnlyPairedReadMerger(int minOverlap, double minimalIdentity, int maxScoreValue) {
         this(minOverlap, minimalIdentity, maxScoreValue, true);
+    }
+
+    /**
+     * Creates paired-end reads merger for Illumina (or other opposite reads) data.
+     *
+     * @param parameters    merger parameters
+     * @param maxScoreValue maximal output quality score value
+     */
+    public MismatchOnlyPairedReadMerger(MergerParameters parameters, int maxScoreValue) {
+        this(parameters.getMinimalOverlap(), parameters.getMinimalIdentity(), maxScoreValue, true);
     }
 
     /**
@@ -53,10 +72,12 @@ public final class MismatchOnlyPairedReadMerger implements Processor<PairedRead,
      * @param maxScoreValue   maximal output quality score value
      * @param isOpposite      {@code true} if reads are on different strands, like Illumina reads
      */
-    public MismatchOnlyPairedReadMerger(int minOverlap, double minimalIdentity, int maxScoreValue, boolean isOpposite) {
+    public MismatchOnlyPairedReadMerger(int minOverlap, double minimalIdentity, int maxScoreValue, Boolean isOpposite) {
         this.minOverlap = minOverlap;
         this.maxMismatchesPart = 1.0 - minimalIdentity;
-        this.isOpposite = isOpposite;
+        this.strands = isOpposite == null ?
+                new boolean[]{false, true} :
+                new boolean[]{isOpposite};
         this.maxScoreValue = maxScoreValue;
 
         // Calculating length fo motif to be used in Bitap search.
@@ -66,65 +87,79 @@ public final class MismatchOnlyPairedReadMerger implements Processor<PairedRead,
 
     @Override
     public PairedReadMergingResult process(PairedRead pairedRead) {
-        NSequenceWithQuality read1 = pairedRead.getR1().getData();
-        NSequenceWithQuality read2 = pairedRead.getR2().getData();
+        NSequenceWithQuality read1p = pairedRead.getR1().getData();
+        NSequenceWithQuality read2p = pairedRead.getR2().getData();
 
         // If there is no sufficient letters in one of read overlapping is impossible
-        if (read1.size() < minOverlap || read2.size() < minOverlap)
+        if (read1p.size() < minOverlap || read2p.size() < minOverlap)
             // Return failed result
             return new PairedReadMergingResult(pairedRead);
 
+        PairedReadMergingResult ret = null;
 
-        // Making reverse complement from second read to bring reads to the same strand
-        // (if reads configuration is opposite)
-        if (isOpposite)
-            read2 = read2.getReverseComplement();
+        for (boolean strand : strands) {
+            NSequenceWithQuality read1 = read1p;
 
-        // read2 always smaller then read1
-        if (read2.size() > read1.size()) {
-            NSequenceWithQuality tmp = read1;
-            read1 = read2;
-            read2 = tmp;
-        }
+            // Making reverse complement from second read to bring reads to the same strand
+            // (if reads configuration is opposite)
+            NSequenceWithQuality read2 = strand ? read2p.getReverseComplement() : read2p;
 
-        // Searching
+            // read2 always smaller then read1
+            if (read2.size() > read1.size()) {
+                NSequenceWithQuality tmp = read1;
+                read1 = read2;
+                read2 = tmp;
+            }
 
-        // Creating bitap pattern for beginning and ending of read2
-        Motif<NucleotideSequence> motif = MotifUtils.twoSequenceMotif(
-                read2.getSequence(), 0,
-                read2.getSequence(), read2.size() - motifLength,
-                motifLength
-        );
-        BitapPattern bitapPattern = motif.toBitapPattern();
-        BitapMatcher bitapMatcher = bitapPattern.substitutionOnlyMatcherFirst(maxMismatchesInMotif, read1.getSequence());
+            // Searching
 
-        int matchPosition, mismatches, overlap;
-
-        while ((matchPosition = bitapMatcher.findNext()) != -1) {
-
-            // Case: beginning of r2 matched
-
-            // Finally checking current hit position
-            overlap = min(read1.size() - matchPosition, read2.size());
-            if ((mismatches = mismatchCount(
-                    read1.getSequence(), matchPosition,
+            // Creating bitap pattern for beginning and ending of read2
+            Motif<NucleotideSequence> motif = MotifUtils.twoSequenceMotif(
                     read2.getSequence(), 0,
-                    overlap)) <= overlap * maxMismatchesPart)
-                return new PairedReadMergingResult(pairedRead, overlap(read1, read2, matchPosition),
-                        overlap, mismatches);
+                    read2.getSequence(), read2.size() - motifLength,
+                    motifLength
+            );
+            BitapPattern bitapPattern = motif.toBitapPattern();
+            BitapMatcher bitapMatcher = bitapPattern.substitutionOnlyMatcherFirst(maxMismatchesInMotif, read1.getSequence());
 
-            // Case: ending of r2 matched
-            matchPosition += motifLength; // Calculating position of right overlap boundary
-            overlap = min(matchPosition, read2.size());
-            if ((mismatches = mismatchCount(
-                    read1.getSequence(), matchPosition - overlap,
-                    read2.getSequence(), max(0, read2.size() - overlap),
-                    overlap)) <= overlap * maxMismatchesPart)
-                return new PairedReadMergingResult(pairedRead, overlap(read1, read2, min(matchPosition - read2.size(), 0)),
-                        overlap, mismatches);
+            int matchPosition, mismatches, overlap;
+
+            PairedReadMergingResult tmp = null;
+            while ((matchPosition = bitapMatcher.findNext()) != -1) {
+
+                // Case: beginning of r2 matched
+
+                // Finally checking current hit position
+                overlap = min(read1.size() - matchPosition, read2.size());
+                if ((mismatches = mismatchCount(
+                        read1.getSequence(), matchPosition,
+                        read2.getSequence(), 0,
+                        overlap)) <= overlap * maxMismatchesPart) {
+                    tmp = new PairedReadMergingResult(pairedRead, overlap(read1, read2, matchPosition),
+                            overlap, mismatches);
+                    break;
+                }
+
+                // Case: ending of r2 matched
+                matchPosition += motifLength; // Calculating position of right overlap boundary
+                overlap = min(matchPosition, read2.size());
+                if ((mismatches = mismatchCount(
+                        read1.getSequence(), matchPosition - overlap,
+                        read2.getSequence(), max(0, read2.size() - overlap),
+                        overlap)) <= overlap * maxMismatchesPart) {
+                    tmp = new PairedReadMergingResult(pairedRead, overlap(read1, read2, min(matchPosition - read2.size(), 0)),
+                            overlap, mismatches);
+                    break;
+                }
+            }
+            if (tmp != null && (ret == null || ret.score() < tmp.score()))
+                ret = tmp;
         }
 
-        return new PairedReadMergingResult(pairedRead);
+        if (ret == null)
+            return new PairedReadMergingResult(pairedRead);
+        else
+            return ret;
     }
 
     /**
