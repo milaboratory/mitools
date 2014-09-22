@@ -27,35 +27,35 @@ public final class MismatchOnlyPairedReadMerger implements Processor<PairedRead,
     /**
      * Creates paired-end reads merger for Illumina (or other opposite reads) data.
      *
-     * @param minOverlap    minimal number of nucleotide in overlap region
-     * @param maxMismatchesPart maximal allowed percent of mismatches in overlap region
+     * @param minOverlap      minimal number of nucleotide in overlap region
+     * @param minimalIdentity maximal allowed percent of mismatches in overlap region
      */
-    public MismatchOnlyPairedReadMerger(int minOverlap, double maxMismatchesPart) {
-        this(minOverlap, maxMismatchesPart, DEFAULT_MAX_SCORE_VALUE, true);
+    public MismatchOnlyPairedReadMerger(int minOverlap, double minimalIdentity) {
+        this(minOverlap, minimalIdentity, DEFAULT_MAX_SCORE_VALUE, true);
     }
 
     /**
      * Creates paired-end reads merger for Illumina (or other opposite reads) data.
      *
-     * @param minOverlap    minimal number of nucleotide in overlap region
-     * @param maxMismatchesPart maximal allowed percent of mismatches in overlap region
-     * @param maxScoreValue maximal output quality score value
+     * @param minOverlap      minimal number of nucleotide in overlap region
+     * @param minimalIdentity maximal allowed percent of mismatches in overlap region
+     * @param maxScoreValue   maximal output quality score value
      */
-    public MismatchOnlyPairedReadMerger(int minOverlap, double maxMismatchesPart, int maxScoreValue) {
-        this(minOverlap, maxMismatchesPart, maxScoreValue, true);
+    public MismatchOnlyPairedReadMerger(int minOverlap, double minimalIdentity, int maxScoreValue) {
+        this(minOverlap, minimalIdentity, maxScoreValue, true);
     }
 
     /**
      * Creates paired-end reads merger.
      *
-     * @param minOverlap    minimal number of nucleotide in overlap region
-     * @param maxMismatchesPart maximal allowed percent of mismatches in overlap region
-     * @param maxScoreValue maximal output quality score value
-     * @param isOpposite    {@code true} if reads are on different strands, like Illumina reads
+     * @param minOverlap      minimal number of nucleotide in overlap region
+     * @param minimalIdentity maximal allowed percent of mismatches in overlap region
+     * @param maxScoreValue   maximal output quality score value
+     * @param isOpposite      {@code true} if reads are on different strands, like Illumina reads
      */
-    public MismatchOnlyPairedReadMerger(int minOverlap, double maxMismatchesPart, int maxScoreValue, boolean isOpposite) {
+    public MismatchOnlyPairedReadMerger(int minOverlap, double minimalIdentity, int maxScoreValue, boolean isOpposite) {
         this.minOverlap = minOverlap;
-        this.maxMismatchesPart = maxMismatchesPart;
+        this.maxMismatchesPart = 1.0 - minimalIdentity;
         this.isOpposite = isOpposite;
         this.maxScoreValue = maxScoreValue;
 
