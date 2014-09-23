@@ -46,6 +46,16 @@ public final class MismatchOnlyPairedReadMerger implements Processor<PairedRead,
     /**
      * Creates paired-end reads merger for Illumina (or other opposite reads) data.
      *
+     * @param parameters merger parameters
+     * @param isOpposite is opposite
+     */
+    public MismatchOnlyPairedReadMerger(MergerParameters parameters, Boolean isOpposite) {
+        this(parameters.getMinimalOverlap(), parameters.getMinimalIdentity(), DEFAULT_MAX_SCORE_VALUE, isOpposite);
+    }
+
+    /**
+     * Creates paired-end reads merger for Illumina (or other opposite reads) data.
+     *
      * @param minOverlap      minimal number of nucleotide in overlap region
      * @param minimalIdentity maximal allowed percent of mismatches in overlap region
      * @param maxScoreValue   maximal output quality score value
