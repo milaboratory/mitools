@@ -13,7 +13,7 @@ import com.milaboratory.core.io.sequence.fastq.SingleFastqWriter;
 import com.milaboratory.mitools.com.milaboratory.cli.Action;
 import com.milaboratory.mitools.com.milaboratory.cli.ActionHelper;
 import com.milaboratory.mitools.com.milaboratory.cli.ActionParameters;
-import com.milaboratory.mitools.com.milaboratory.cli.Util;
+import com.milaboratory.mitools.com.milaboratory.cli.MiCLIUtil;
 import com.milaboratory.mitools.trimmer.ReadLengthFilter;
 import com.milaboratory.mitools.trimmer.SequenceTrimmer;
 import com.milaboratory.util.SmartProgressReporter;
@@ -32,8 +32,8 @@ public class TrimAction implements Action {
 
     @Override
     public void go(ActionHelper helper) throws Exception {
-        try (SingleFastqReader reader = Util.createSingleReader(actionParameters.getInput());
-             SingleFastqWriter writer = Util.createSingleWriter(actionParameters.getOutput())) {
+        try (SingleFastqReader reader = MiCLIUtil.createSingleReader(actionParameters.getInput());
+             SingleFastqWriter writer = MiCLIUtil.createSingleWriter(actionParameters.getOutput())) {
             SmartProgressReporter.startProgressReport("Trimming", reader);
 
             SimpleReadsStatisticsPortWrapper<SingleRead> stats = new SimpleReadsStatisticsPortWrapper<>(reader);

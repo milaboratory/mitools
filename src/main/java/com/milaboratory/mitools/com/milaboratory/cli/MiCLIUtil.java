@@ -11,7 +11,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-public class Util {
+public class MiCLIUtil {
     public static SingleFastqWriter createSingleWriter(String fileName) throws IOException {
         if (fileName.equals("-"))
             return new SingleFastqWriter(System.out);

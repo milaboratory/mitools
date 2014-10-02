@@ -15,7 +15,7 @@ import com.milaboratory.core.io.sequence.fastq.SingleFastqWriter;
 import com.milaboratory.mitools.com.milaboratory.cli.Action;
 import com.milaboratory.mitools.com.milaboratory.cli.ActionHelper;
 import com.milaboratory.mitools.com.milaboratory.cli.ActionParameters;
-import com.milaboratory.mitools.com.milaboratory.cli.Util;
+import com.milaboratory.mitools.com.milaboratory.cli.MiCLIUtil;
 import com.milaboratory.mitools.merger.MismatchOnlyPairedReadMerger;
 import com.milaboratory.mitools.merger.PairedReadMergingResult;
 import com.milaboratory.util.SmartProgressReporter;
@@ -39,7 +39,7 @@ public class MergeAction implements Action {
 
         long total = 0, overlapped = 0;
         try (PairedFastqReader reader = new PairedFastqReader(actionParameters.getR1(), actionParameters.getR2());
-             SingleFastqWriter mainWriter = Util.createSingleWriter(actionParameters.getOutput());
+             SingleFastqWriter mainWriter = MiCLIUtil.createSingleWriter(actionParameters.getOutput());
              SingleFastqWriter nfWriter = actionParameters.forwardNegative == null ?
                      null : new SingleFastqWriter(actionParameters.forwardNegative);
              SingleFastqWriter nrWriter = actionParameters.reverseNegative == null ?
@@ -113,13 +113,13 @@ public class MergeAction implements Action {
         @Parameter(description = "FASTQ file to put non-overlapped forward reads (supported formats: " +
                 "*.fastq and *.fastq.gz).",
                 names = {"-nf", "--negative-forward"},
-                converter = Util.FileConverter.class)
+                converter = MiCLIUtil.FileConverter.class)
         File forwardNegative;
 
         @Parameter(description = "FASTQ file to put non-overlapped reverse reads (supported formats: " +
                 "*.fastq and *.fastq.gz).",
                 names = {"-nr", "--negative-reverse"},
-                converter = Util.FileConverter.class)
+                converter = MiCLIUtil.FileConverter.class)
         File reverseNegative;
 
         @Parameter(description = "Report file.",
