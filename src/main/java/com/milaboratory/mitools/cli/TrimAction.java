@@ -34,7 +34,7 @@ public class TrimAction implements Action {
     public void go(ActionHelper helper) throws Exception {
         try (SingleFastqReader reader = MiCLIUtil.createSingleReader(actionParameters.getInput());
              SingleFastqWriter writer = MiCLIUtil.createSingleWriter(actionParameters.getOutput())) {
-            SmartProgressReporter.startProgressReport("Trimming", reader);
+            SmartProgressReporter.startProgressReport("Trimming", reader, System.err);
 
             SimpleReadsStatisticsPortWrapper<SingleRead> stats = new SimpleReadsStatisticsPortWrapper<>(reader);
 

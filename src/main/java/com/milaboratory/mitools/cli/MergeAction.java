@@ -44,7 +44,7 @@ public class MergeAction implements Action {
                      null : new SingleFastqWriter(actionParameters.forwardNegative);
              SingleFastqWriter nrWriter = actionParameters.reverseNegative == null ?
                      null : new SingleFastqWriter(actionParameters.reverseNegative)) {
-            SmartProgressReporter.startProgressReport("Merging", reader);
+            SmartProgressReporter.startProgressReport("Merging", reader, System.err);
 
             final Merger<PairedRead> buffered = buffered(reader, 256);
 

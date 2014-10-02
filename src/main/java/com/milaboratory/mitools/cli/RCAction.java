@@ -24,7 +24,7 @@ public class RCAction implements Action {
     public void go(ActionHelper helper) throws Exception {
         try (SingleFastqReader reader = MiCLIUtil.createSingleReader(actionParameters.getInput());
              SingleSequenceWriter writer = MiCLIUtil.createSingleWriter(actionParameters.getOutput())) {
-            SmartProgressReporter.startProgressReport("Processing", reader);
+            SmartProgressReporter.startProgressReport("Processing", reader, System.err);
             for (SingleRead read : CUtils.it(reader)) {
                 SingleRead rc = new SingleReadImpl(read.getId(), read.getData().getReverseComplement(), read.getDescription());
                 writer.write(rc);

@@ -25,7 +25,7 @@ public class RenameAction implements Action {
         final String pattern = actionParameters.pattern;
         try (SingleFastqReader reader = MiCLIUtil.createSingleReader(actionParameters.getInput());
              SingleSequenceWriter writer = MiCLIUtil.createSingleWriter(actionParameters.getOutput())) {
-            SmartProgressReporter.startProgressReport("Processing", reader);
+            SmartProgressReporter.startProgressReport("Processing", reader, System.err);
             for (SingleRead read : CUtils.it(reader)) {
                 String description = pattern.replace("%n", Long.toString(read.getId()));
                 description = description.replace("%o", read.getDescription());
