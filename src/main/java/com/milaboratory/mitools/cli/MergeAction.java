@@ -35,7 +35,7 @@ public class MergeAction implements Action {
     @Override
     public void go(ActionHelper helper) throws Exception {
         final MismatchOnlyPairedReadMerger merger = new MismatchOnlyPairedReadMerger(actionParameters.overlap,
-                1.0 - actionParameters.similarity);
+                actionParameters.similarity);
 
         long total = 0, overlapped = 0;
         try (PairedFastqReader reader = new PairedFastqReader(actionParameters.getR1(), actionParameters.getR2());
