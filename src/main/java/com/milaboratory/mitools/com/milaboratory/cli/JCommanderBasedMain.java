@@ -14,6 +14,7 @@ public class JCommanderBasedMain implements ActionHelper {
     protected final Map<String, Action> actions = new LinkedHashMap<>();
     protected final String command;
     protected boolean printHelpOnError = false;
+    protected boolean printStackTrace = false;
     protected PrintStream outputStream = System.err;
     protected String[] arguments;
 
@@ -41,6 +42,14 @@ public class JCommanderBasedMain implements ActionHelper {
             builder.append(arg);
         }
         return builder.toString();
+    }
+
+    public boolean isPrintStackTrace() {
+        return printStackTrace;
+    }
+
+    public void setPrintStackTrace(boolean printStackTrace) {
+        this.printStackTrace = printStackTrace;
     }
 
     protected void reg(Action a) {
@@ -124,6 +133,8 @@ public class JCommanderBasedMain implements ActionHelper {
     protected void printException(ParameterException e,
                                   JCommander commander, Action action) {
         outputStream.println("Error: " + e.getMessage());
+        if (printStackTrace)
+            e.printStackTrace(new PrintStream(outputStream));
         if (printHelpOnError)
             printActionHelp(commander, action);
     }
