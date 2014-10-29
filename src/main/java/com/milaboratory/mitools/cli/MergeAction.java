@@ -161,12 +161,12 @@ public class MergeAction implements Action {
         }
 
         public String getOutput() {
-            return parameters.get(2);
+            return parameters.size() == 2 ? "-" : parameters.get(2);
         }
 
         @Override
         public void validate() {
-            if (parameters.size() != 3)
+            if (parameters.size() > 3 || parameters.size() < 2)
                 throw new ParameterException("Wrong number of parameters.");
         }
     }
