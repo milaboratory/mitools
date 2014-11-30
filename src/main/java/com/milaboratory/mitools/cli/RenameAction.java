@@ -8,10 +8,6 @@ import com.milaboratory.core.io.sequence.SingleRead;
 import com.milaboratory.core.io.sequence.SingleReadImpl;
 import com.milaboratory.core.io.sequence.SingleSequenceWriter;
 import com.milaboratory.core.io.sequence.fastq.SingleFastqReader;
-import com.milaboratory.mitools.com.milaboratory.cli.Action;
-import com.milaboratory.mitools.com.milaboratory.cli.ActionHelper;
-import com.milaboratory.mitools.com.milaboratory.cli.ActionParameters;
-import com.milaboratory.mitools.com.milaboratory.cli.MiCLIUtil;
 import com.milaboratory.util.SmartProgressReporter;
 
 import java.util.ArrayList;

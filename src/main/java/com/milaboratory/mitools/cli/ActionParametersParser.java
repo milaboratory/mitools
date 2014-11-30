@@ -1,4 +1,4 @@
-package com.milaboratory.mitools.com.milaboratory.cli;
+package com.milaboratory.mitools.cli;
 
 public interface ActionParametersParser {
     void parseParameters(String[] args);

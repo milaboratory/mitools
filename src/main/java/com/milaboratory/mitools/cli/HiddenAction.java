@@ -1,4 +1,4 @@
-package com.milaboratory.mitools.com.milaboratory.cli;
+package com.milaboratory.mitools.cli;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

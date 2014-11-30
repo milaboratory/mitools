@@ -1,4 +1,4 @@
-package com.milaboratory.mitools.com.milaboratory.cli;
+package com.milaboratory.mitools.cli;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;

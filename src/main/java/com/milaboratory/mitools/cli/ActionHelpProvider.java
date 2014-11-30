@@ -1,4 +1,4 @@
-package com.milaboratory.mitools.com.milaboratory.cli;
+package com.milaboratory.mitools.cli;
 
 /**
  * Created by dbolotin on 28/08/14.

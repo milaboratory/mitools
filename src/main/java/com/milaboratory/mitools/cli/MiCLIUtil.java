@@ -1,4 +1,4 @@
-package com.milaboratory.mitools.com.milaboratory.cli;
+package com.milaboratory.mitools.cli;
 
 import com.beust.jcommander.IParameterValidator;
 import com.beust.jcommander.IStringConverter;
