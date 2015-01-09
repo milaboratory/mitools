@@ -48,7 +48,7 @@ public class ProcessAction implements Action {
         return actionParameters;
     }
 
-    @Parameters(commandDescription = "Reverse complement.", optionPrefixes = "-")
+    @Parameters(commandDescription = "Custom reads processing.", optionPrefixes = "-")
     public static final class RenameParameters extends ActionParameters {
         @Parameter(description = "Actions",
                 names = {"-a", "--actions"})

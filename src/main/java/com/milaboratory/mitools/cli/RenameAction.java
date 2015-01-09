@@ -41,7 +41,7 @@ public class RenameAction implements Action {
         return actionParameters;
     }
 
-    @Parameters(commandDescription = "Reverse complement.", optionPrefixes = "-")
+    @Parameters(commandDescription = "Relabel sequences.", optionPrefixes = "-")
     public static final class RenameParameters extends ActionParameters {
         @Parameter(description = "[ input_file_R1.fastq[.gz] [ output_file.fastq[.gz] ] ]", variableArity = true)
         public List<String> parameters = new ArrayList<>();
