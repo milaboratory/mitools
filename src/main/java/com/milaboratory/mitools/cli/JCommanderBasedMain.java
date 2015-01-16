@@ -60,6 +60,11 @@ public class JCommanderBasedMain implements ActionHelper {
         // Saving current arguments
         this.arguments = args;
 
+        if (args.length == 0) {
+            printGlobalHelp();
+            return;
+        }
+
         // Setting up JCommander
         MainParameters mainParameters = new MainParameters();
         JCommander commander = new JCommander(mainParameters);
@@ -119,6 +124,18 @@ public class JCommanderBasedMain implements ActionHelper {
         } catch (ParameterException pe) {
             printException(pe, commander, action);
         }
+    }
+
+    protected void printGlobalHelp() {
+        // Creating new instance of jCommander to add only non-hidden actions
+        JCommander tmpCommander = new JCommander(new MainParameters());
+        tmpCommander.setProgramName(command);
+        for (Action a : actions.values())
+            if (!a.getClass().isAnnotationPresent(HiddenAction.class))
+                tmpCommander.addCommand(a.command(), a.params());
+        StringBuilder builder = new StringBuilder();
+        tmpCommander.usage(builder);
+        outputStream.print(builder);
     }
 
     protected void printActionHelp(JCommander commander, Action action) {
