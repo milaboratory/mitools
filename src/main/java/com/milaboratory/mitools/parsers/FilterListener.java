@@ -24,28 +24,6 @@ public interface FilterListener extends ParseTreeListener {
 	void exitSequence(@NotNull FilterParser.SequenceContext ctx);
 
 	/**
-	 * Enter a parse tree produced by {@link FilterParser#number}.
-	 * @param ctx the parse tree
-	 */
-	void enterNumber(@NotNull FilterParser.NumberContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link FilterParser#number}.
-	 * @param ctx the parse tree
-	 */
-	void exitNumber(@NotNull FilterParser.NumberContext ctx);
-
-	/**
-	 * Enter a parse tree produced by {@link FilterParser#sequenceProcessor}.
-	 * @param ctx the parse tree
-	 */
-	void enterSequenceProcessor(@NotNull FilterParser.SequenceProcessorContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link FilterParser#sequenceProcessor}.
-	 * @param ctx the parse tree
-	 */
-	void exitSequenceProcessor(@NotNull FilterParser.SequenceProcessorContext ctx);
-
-	/**
 	 * Enter a parse tree produced by {@link FilterParser#description}.
 	 * @param ctx the parse tree
 	 */
@@ -55,6 +33,17 @@ public interface FilterListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitDescription(@NotNull FilterParser.DescriptionContext ctx);
+
+	/**
+	 * Enter a parse tree produced by {@link FilterParser#quality}.
+	 * @param ctx the parse tree
+	 */
+	void enterQuality(@NotNull FilterParser.QualityContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link FilterParser#quality}.
+	 * @param ctx the parse tree
+	 */
+	void exitQuality(@NotNull FilterParser.QualityContext ctx);
 
 	/**
 	 * Enter a parse tree produced by {@link FilterParser#actionSet}.
@@ -68,6 +57,28 @@ public interface FilterListener extends ParseTreeListener {
 	void exitActionSet(@NotNull FilterParser.ActionSetContext ctx);
 
 	/**
+	 * Enter a parse tree produced by {@link FilterParser#sequenceProcessor}.
+	 * @param ctx the parse tree
+	 */
+	void enterSequenceProcessor(@NotNull FilterParser.SequenceProcessorContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link FilterParser#sequenceProcessor}.
+	 * @param ctx the parse tree
+	 */
+	void exitSequenceProcessor(@NotNull FilterParser.SequenceProcessorContext ctx);
+
+	/**
+	 * Enter a parse tree produced by {@link FilterParser#number}.
+	 * @param ctx the parse tree
+	 */
+	void enterNumber(@NotNull FilterParser.NumberContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link FilterParser#number}.
+	 * @param ctx the parse tree
+	 */
+	void exitNumber(@NotNull FilterParser.NumberContext ctx);
+
+	/**
 	 * Enter a parse tree produced by {@link FilterParser#logicalExpression}.
 	 * @param ctx the parse tree
 	 */
@@ -77,15 +88,4 @@ public interface FilterListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitLogicalExpression(@NotNull FilterParser.LogicalExpressionContext ctx);
-
-	/**
-	 * Enter a parse tree produced by {@link FilterParser#quality}.
-	 * @param ctx the parse tree
-	 */
-	void enterQuality(@NotNull FilterParser.QualityContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link FilterParser#quality}.
-	 * @param ctx the parse tree
-	 */
-	void exitQuality(@NotNull FilterParser.QualityContext ctx);
 }
