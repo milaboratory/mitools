@@ -6,7 +6,8 @@ public class Main {
                 new MergeAction(),
                 new TrimAction(),
                 new RCAction(),
-                new RenameAction());
+                new RenameAction(),
+                new ProcessAction());
         main.main(args);
     }
 }
