@@ -27,7 +27,7 @@ import com.milaboratory.primitivio.annotations.Serializable;
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, isGetterVisibility = JsonAutoDetect.Visibility.NONE,
         getterVisibility = JsonAutoDetect.Visibility.NONE)
 @Serializable(asJson = true)
-public final class MergerParameters {
+public final class MergerParameters implements java.io.Serializable{
     final int minimalOverlap;
     final double minimalIdentity;
 

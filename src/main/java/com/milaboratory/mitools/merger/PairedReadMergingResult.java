@@ -18,7 +18,7 @@ package com.milaboratory.mitools.merger;
 import com.milaboratory.core.io.sequence.PairedRead;
 import com.milaboratory.core.sequence.NSequenceWithQuality;
 
-public class PairedReadMergingResult {
+public class PairedReadMergingResult implements java.io.Serializable {
     private static final int MATCH_SCORE = 2;
     private static final int MISMATCH_SCORE = -5;
 
@@ -77,5 +77,38 @@ public class PairedReadMergingResult {
 
     int score() {
         return (overlap - errors) * MATCH_SCORE + errors * MISMATCH_SCORE;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        PairedReadMergingResult that = (PairedReadMergingResult) o;
+
+        if (overlap != that.overlap) return false;
+        if (errors != that.errors) return false;
+        if (!originalRead.equals(that.originalRead)) return false;
+        return overlappedSequence.equals(that.overlappedSequence);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = originalRead.hashCode();
+        result = 31 * result + overlappedSequence.hashCode();
+        result = 31 * result + overlap;
+        result = 31 * result + errors;
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "PairedReadMergingResult{" +
+                "originalRead=" + originalRead +
+                ", overlappedSequence=" + overlappedSequence +
+                ", overlap=" + overlap +
+                ", errors=" + errors +
+                '}';
     }
 }

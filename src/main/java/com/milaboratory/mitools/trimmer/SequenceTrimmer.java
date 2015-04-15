@@ -22,7 +22,7 @@ import com.milaboratory.core.sequence.SequenceQuality;
 
 import java.util.concurrent.atomic.AtomicLong;
 
-public final class SequenceTrimmer implements Processor<SingleRead, SingleRead> {
+public final class SequenceTrimmer implements Processor<SingleRead, SingleRead>, java.io.Serializable {
     final int qualityToTrimm;
     final boolean trimmLeft, trimmRight;
     final AtomicLong trimmedNucleotidesLeft = new AtomicLong(),
