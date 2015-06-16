@@ -29,7 +29,8 @@ import com.milaboratory.core.sequence.SequenceQualityBuilder;
 import static com.milaboratory.core.sequence.SequencesUtils.mismatchCount;
 import static java.lang.Math.*;
 
-public final class MismatchOnlyPairedReadMerger implements Processor<PairedRead, PairedReadMergingResult> {
+public final class MismatchOnlyPairedReadMerger implements Processor<PairedRead, PairedReadMergingResult>,
+        java.io.Serializable {
     public static final int DEFAULT_MAX_SCORE_VALUE = 45;
     final int minOverlap;
     final double maxMismatchesPart;
