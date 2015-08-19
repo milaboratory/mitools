@@ -43,7 +43,7 @@ public class TrimAction implements Action {
 
     @Override
     public void go(ActionHelper helper) throws Exception {
-        try (SingleFastqReader reader = MiCLIUtil.createSingleReader(actionParameters.getInput());
+        try (SingleFastqReader reader = MiCLIUtil.createSingleReader(actionParameters.getInput(), false);
              SingleFastqWriter writer = MiCLIUtil.createSingleWriter(actionParameters.getOutput())) {
             SmartProgressReporter.startProgressReport("Trimming", reader, System.err);
 

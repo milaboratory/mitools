@@ -23,7 +23,7 @@ import com.milaboratory.core.motif.Motif;
 import com.milaboratory.core.motif.MotifUtils;
 import com.milaboratory.core.sequence.NSequenceWithQuality;
 import com.milaboratory.core.sequence.NucleotideSequence;
-import com.milaboratory.core.sequence.NucleotideSequenceBuilder;
+import com.milaboratory.core.sequence.SequenceBuilder;
 import com.milaboratory.core.sequence.SequenceQualityBuilder;
 
 import static com.milaboratory.core.sequence.SequencesUtils.mismatchCount;
@@ -145,7 +145,7 @@ public final class MismatchOnlyPairedReadMerger implements Processor<PairedRead,
                     read2.getSequence(), read2.size() - motifLength,
                     motifLength
             );
-            BitapPattern bitapPattern = motif.toBitapPattern();
+            BitapPattern bitapPattern = motif.getBitapPattern();
             BitapMatcher bitapMatcher = bitapPattern.substitutionOnlyMatcherFirst(maxMismatchesInMotif, read1.getSequence());
 
             int matchPosition, mismatches, overlap;
@@ -202,7 +202,8 @@ public final class MismatchOnlyPairedReadMerger implements Processor<PairedRead,
                         max(seq1.size(), seq2.size() + offset) // offset is negative here
                 );
 
-        NucleotideSequenceBuilder seqBuilder = new NucleotideSequenceBuilder().ensureCapacity(length);
+        SequenceBuilder<NucleotideSequence> seqBuilder = NucleotideSequence.ALPHABET.getBuilder()
+                .ensureCapacity(length);
         SequenceQualityBuilder qualBuilder = new SequenceQualityBuilder().ensureCapacity(length);
 
         byte quality, letter, l, q;

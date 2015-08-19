@@ -34,7 +34,7 @@ public class RenameAction implements Action {
     @Override
     public void go(ActionHelper helper) throws Exception {
         final String pattern = actionParameters.pattern;
-        try (SingleFastqReader reader = MiCLIUtil.createSingleReader(actionParameters.getInput());
+        try (SingleFastqReader reader = MiCLIUtil.createSingleReader(actionParameters.getInput(), false);
              SingleSequenceWriter writer = MiCLIUtil.createSingleWriter(actionParameters.getOutput())) {
             SmartProgressReporter.startProgressReport("Processing", reader, System.err);
             for (SingleRead read : CUtils.it(reader)) {
