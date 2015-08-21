@@ -33,10 +33,10 @@ public class MiCLIUtil {
         return new SingleFastqWriter(fileName);
     }
 
-    public static SingleFastqReader createSingleReader(String fileName) throws IOException {
+    public static SingleFastqReader createSingleReader(String fileName, boolean replaceWildcards) throws IOException {
         if (fileName.equals("-"))
-            return new SingleFastqReader(System.in);
-        return new SingleFastqReader(fileName);
+            return new SingleFastqReader(System.in, replaceWildcards);
+        return new SingleFastqReader(fileName, replaceWildcards);
     }
 
     public static class FileConverter implements IStringConverter<File> {
