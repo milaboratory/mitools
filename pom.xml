@@ -120,6 +120,11 @@
             <artifactId>jcommander</artifactId>
             <version>1.30</version>
         </dependency>
+        <dependency>
+            <groupId>cc.redberry</groupId>
+            <artifactId>pipe</artifactId>
+            <version>0.9.4</version>
+        </dependency>
     </dependencies>
 
     <properties>
