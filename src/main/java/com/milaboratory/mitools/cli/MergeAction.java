@@ -46,7 +46,8 @@ public class MergeAction implements Action {
     @Override
     public void go(ActionHelper helper) throws Exception {
         final MismatchOnlyPairedReadMerger merger = new MismatchOnlyPairedReadMerger(actionParameters.overlap,
-                actionParameters.similarity);
+                actionParameters.similarity, MismatchOnlyPairedReadMerger.DEFAULT_MAX_SCORE_VALUE,
+                !actionParameters.sameStrand);
 
         long total = 0, overlapped = 0;
         try (PairedFastqReader reader = new PairedFastqReader(actionParameters.getR1(), actionParameters.getR2());
@@ -150,6 +151,10 @@ public class MergeAction implements Action {
         @Parameter(description = "Discard original sequence header and put sequential ids.",
                 names = {"-d", "--discard-header"})
         boolean discardHeader;
+
+        @Parameter(description = "Assume that reads are on the same strand (opposite of raw Illumina reads orientation).",
+                names = {"-ss", "--same-strand"})
+        boolean sameStrand;
 
         @Parameter(description = "Minimal overlap.",
                 names = {"-p", "--overlap"}, validateWith = PositiveInteger.class)
