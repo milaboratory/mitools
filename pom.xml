@@ -19,7 +19,7 @@
 
     <groupId>com.milaboratory</groupId>
     <artifactId>mitools</artifactId>
-    <version>1.1</version>
+    <version>1.1.1</version>
     <packaging>jar</packaging>
     <name>MiTools</name>
     <url>http://milaboratory.com/</url>
@@ -119,6 +119,11 @@
             <groupId>com.beust</groupId>
             <artifactId>jcommander</artifactId>
             <version>1.30</version>
+        </dependency>
+        <dependency>
+            <groupId>cc.redberry</groupId>
+            <artifactId>pipe</artifactId>
+            <version>0.9.4</version>
         </dependency>
     </dependencies>
 
