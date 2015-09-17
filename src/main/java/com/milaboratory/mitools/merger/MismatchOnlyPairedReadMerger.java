@@ -31,7 +31,8 @@ import static java.lang.Math.*;
 
 public final class MismatchOnlyPairedReadMerger implements Processor<PairedRead, PairedReadMergingResult>,
         java.io.Serializable {
-    public static final int DEFAULT_MAX_SCORE_VALUE = 50;
+    public static final int DEFAULT_MAX_SCORE_VALUE = 50,
+            MIN_SCORE_VALUE = 3; // 50-50
     final int minOverlap;
     final double maxMismatchesPart;
     final int maxScoreValue;
@@ -231,7 +232,9 @@ public final class MismatchOnlyPairedReadMerger implements Processor<PairedRead,
                     quality = (byte) min(maxScoreValue, quality + q);
                 else if (q > quality) {
                     letter = l;
-                    quality = q;
+                    quality = (byte) max(MIN_SCORE_VALUE, q - quality);
+                } else {
+                    quality = (byte) max(MIN_SCORE_VALUE, quality - q);
                 }
             }
 
