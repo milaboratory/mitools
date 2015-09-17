@@ -15,21 +15,18 @@
  */
 package com.milaboratory.mitools.merger;
 
-import com.milaboratory.core.PairedEndReadsLayout;
-import com.milaboratory.test.TestUtil;
-import org.junit.Test;
+public enum QualityMergingAlgorithm {
+    SumMax("max"), SumSubtraction("sub");
+    public final String cliName;
 
-public class MergerParametersTest {
-    @Test
-    public void test1() throws Exception {
-        MergerParameters parameters = new MergerParameters(QualityMergingAlgorithm.SumMax, null, 15, 0.8);
-        TestUtil.assertJson(parameters);
+    QualityMergingAlgorithm(String cliName) {
+        this.cliName = cliName;
     }
 
-    @Test
-    public void test2() throws Exception {
-        MergerParameters parameters = new MergerParameters(QualityMergingAlgorithm.SumSubtraction,
-                PairedEndReadsLayout.Collinear, 15, 0.8);
-        TestUtil.assertJson(parameters);
+    public static QualityMergingAlgorithm getFromCLIName(String cliName) {
+        for (QualityMergingAlgorithm qma : values())
+            if (qma.cliName.equals(cliName))
+                return qma;
+        return null;
     }
 }
