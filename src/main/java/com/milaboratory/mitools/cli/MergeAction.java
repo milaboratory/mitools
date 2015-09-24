@@ -28,6 +28,7 @@ import com.milaboratory.core.io.sequence.PairedRead;
 import com.milaboratory.core.io.sequence.SingleReadImpl;
 import com.milaboratory.core.io.sequence.fastq.PairedFastqReader;
 import com.milaboratory.core.io.sequence.fastq.SingleFastqWriter;
+import com.milaboratory.mitools.merger.MergerParameters;
 import com.milaboratory.mitools.merger.MismatchOnlyPairedReadMerger;
 import com.milaboratory.mitools.merger.PairedReadMergingResult;
 import com.milaboratory.mitools.merger.QualityMergingAlgorithm;
@@ -49,7 +50,7 @@ public class MergeAction implements Action {
     public void go(ActionHelper helper) throws Exception {
         final MismatchOnlyPairedReadMerger merger = new MismatchOnlyPairedReadMerger(
                 actionParameters.overlap,
-                actionParameters.similarity, MismatchOnlyPairedReadMerger.DEFAULT_MAX_SCORE_VALUE,
+                actionParameters.similarity, actionParameters.maxQuality,
                 actionParameters.getQualityMergingAlgorithm(),
                 actionParameters.sameStrand ? PairedEndReadsLayout.Collinear :
                         PairedEndReadsLayout.Opposite);
@@ -173,6 +174,10 @@ public class MergeAction implements Action {
         @Parameter(description = "Minimal allowed similarity",
                 names = {"-s", "--similarity"})
         double similarity = 0.85;
+
+        @Parameter(description = "Maximal quality to set for letters within overlap.",
+                names = {"-m", "--max-quality"})
+        int maxQuality = MergerParameters.DEFAULT_MAX_QUALITY_VALUE;
 
         @Parameter(description = "Threads",
                 names = {"-t", "--threads"}, validateWith = PositiveInteger.class)

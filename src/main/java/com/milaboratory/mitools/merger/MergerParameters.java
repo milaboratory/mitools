@@ -29,9 +29,11 @@ import com.milaboratory.primitivio.annotations.Serializable;
         getterVisibility = JsonAutoDetect.Visibility.NONE)
 @Serializable(asJson = true)
 public final class MergerParameters implements java.io.Serializable {
+    public static final int DEFAULT_MAX_QUALITY_VALUE = 50;
+
     final QualityMergingAlgorithm qualityMergingAlgorithm;
     final PairedEndReadsLayout partsLayout;
-    final int minimalOverlap;
+    final int minimalOverlap, maxQuality;
     final double minimalIdentity;
 
     @JsonCreator
@@ -39,11 +41,13 @@ public final class MergerParameters implements java.io.Serializable {
             @JsonProperty("qualityMergingAlgorithm") QualityMergingAlgorithm qualityMergingAlgorithm,
             @JsonProperty("partsLayout") PairedEndReadsLayout partsLayout,
             @JsonProperty("minimalOverlap") int minimalOverlap,
+            @JsonProperty("maxQuality") Integer maxQuality,
             @JsonProperty("minimalIdentity") double minimalIdentity) {
         this.qualityMergingAlgorithm = qualityMergingAlgorithm;
         this.partsLayout = partsLayout;
         this.minimalOverlap = minimalOverlap;
         this.minimalIdentity = minimalIdentity;
+        this.maxQuality = maxQuality == null ? DEFAULT_MAX_QUALITY_VALUE : maxQuality;
     }
 
     public int getMinimalOverlap() {
@@ -52,6 +56,10 @@ public final class MergerParameters implements java.io.Serializable {
 
     public double getMinimalIdentity() {
         return minimalIdentity;
+    }
+
+    public int getMaxQuality() {
+        return maxQuality;
     }
 
     public QualityMergingAlgorithm getQualityMergingAlgorithm() {
@@ -63,7 +71,7 @@ public final class MergerParameters implements java.io.Serializable {
     }
 
     public MergerParameters overrideReadsLayout(PairedEndReadsLayout partsLayout) {
-        return new MergerParameters(qualityMergingAlgorithm, partsLayout, minimalOverlap, minimalIdentity);
+        return new MergerParameters(qualityMergingAlgorithm, partsLayout, minimalOverlap, maxQuality, minimalIdentity);
     }
 
     @Override
@@ -74,6 +82,7 @@ public final class MergerParameters implements java.io.Serializable {
         MergerParameters that = (MergerParameters) o;
 
         if (minimalOverlap != that.minimalOverlap) return false;
+        if (maxQuality != that.maxQuality) return false;
         if (Double.compare(that.minimalIdentity, minimalIdentity) != 0) return false;
         if (qualityMergingAlgorithm != that.qualityMergingAlgorithm) return false;
         return partsLayout == that.partsLayout;
@@ -84,9 +93,10 @@ public final class MergerParameters implements java.io.Serializable {
     public int hashCode() {
         int result;
         long temp;
-        result = qualityMergingAlgorithm.hashCode();
+        result = qualityMergingAlgorithm != null ? qualityMergingAlgorithm.hashCode() : 0;
         result = 31 * result + (partsLayout != null ? partsLayout.hashCode() : 0);
         result = 31 * result + minimalOverlap;
+        result = 31 * result + maxQuality;
         temp = Double.doubleToLongBits(minimalIdentity);
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         return result;
