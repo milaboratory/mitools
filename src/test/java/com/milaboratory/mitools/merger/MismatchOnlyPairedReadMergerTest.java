@@ -15,6 +15,7 @@
  */
 package com.milaboratory.mitools.merger;
 
+import com.milaboratory.core.PairedEndReadsLayout;
 import com.milaboratory.core.io.sequence.PairedRead;
 import com.milaboratory.core.io.sequence.SingleReadImpl;
 import com.milaboratory.core.sequence.NSequenceWithQuality;
@@ -72,7 +73,7 @@ public class MismatchOnlyPairedReadMergerTest {
                 "CGACATTGAGAAGACCGGCCGTTCTCCTTTGACATGATTGGATCGGTTGCTGCCGGCCCAGAATCCTAGCAG",
                 1, 10,
                 "CGCACAGTGTTGTCAAAGAAAACGCGTACGACATTGAGAAGACCGGCCGTTCTCCTTTGACATGATTGGATCGGTTGCTGCCGGCCCAGAATCCTAGCAG",
-                "AAAAAAAAAAAAAAAAAAAAAAAAAAAAXXXXXXXXXXXBXXXXXXXXBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
+                "AAAAAAAAAAAAAAAAAAAAAAAAAAAAXXXXXXXXXXX$XXXXXXXXBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
         mAssert("CGCACAGTGTTGTCAAAGAAAACGCGTACGACATTGAGACGACCGGCC",
                 "CGACATTGAGAAGACCGGCCGTTCTCCTTTGACATGATTGGATCGGTTGCTGCCGGCCCAGAATCCTAGCAG",
                 0, 10, null, null);
@@ -87,7 +88,7 @@ public class MismatchOnlyPairedReadMergerTest {
                 "TGTCAAAGAAAACGCGTACGACATTGAGAAGACCGGCCGTT",
                 1, 10,
                 "CGCACAGTGTTGTCAAAGAAAACGCGTACGACATTGAGAAGACCGGCCGTTCTCCTTTGACATGATTGGATCGGTTGCTGCCGGCCCAGAATCCTAGCAG",
-                "AAAAAAAAAAXXXXXXXXXBXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+                "AAAAAAAAAAXXXXXXXXX$XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
         mAssert("CGCACAGTGTTGTCAAAGACAACGCGTACGACATTGAGAAGACCGGCCGTTCTCCTTTGACATGATTGGATCGGTTGCTGCCGGCCCAGAATCCTAGCAG",
                 "TGTCAAAGAAAACGCGTACGACATTGAGAAGACCGGCCGTT",
                 0, 10, null, null);
@@ -103,7 +104,7 @@ public class MismatchOnlyPairedReadMergerTest {
                 "TCTCCTTTGACATGATTGGATCGGTTGCTGCCGGCCCAGAATCCTAGCAG",
                 1, 10,
                 "CGCACAGTGTTGTCAAAGAAAACGCGTACGACATTGAGAAGACCGGCCGTTCTCCTTTGACATGATTGGATCGGTTGCTGCCGGCCCAGAATCCTAGCAG",
-                "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABXXXXXXXXXXXXXXXXXXXXXBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
+                "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA$XXXXXXXXXXXXXXXXXXXXXBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
         mAssert("CGCACAGTGTTGTCAAAGAAAACGCGTACGACATTGAGAAGACCGGCCGTACTCCTTTGACATGATTGGATC",
                 "TCTCCTTTGACATGATTGGATCGGTTGCTGCCGGCCCAGAATCCTAGCAG",
                 0, 10, null, null);
@@ -111,7 +112,9 @@ public class MismatchOnlyPairedReadMergerTest {
 
     public static void mAssert(String seq1, String seq2, int maxMuts, int overlap,
                                String expectedSequence, String expectedQuality) {
-        MismatchOnlyPairedReadMerger merger = new MismatchOnlyPairedReadMerger(overlap, 1.0 - 1.0 * maxMuts / overlap, 55, false);
+        MismatchOnlyPairedReadMerger merger = new MismatchOnlyPairedReadMerger(overlap, 1.0 - 1.0 * maxMuts / overlap, 55,
+                QualityMergingAlgorithm.SumSubtraction,
+                PairedEndReadsLayout.Collinear);
         PairedReadMergingResult processed = merger.process(new PairedRead(
                 new SingleReadImpl(0, new NSequenceWithQuality(seq1, lets('A', seq1.length())), "A"),
                 new SingleReadImpl(0, new NSequenceWithQuality(seq2, lets('B', seq2.length())), "B")));
@@ -123,7 +126,9 @@ public class MismatchOnlyPairedReadMergerTest {
             Assert.assertEquals(expectedQuality, processed.getOverlappedSequence().getQuality().toString());
         }
 
-        merger = new MismatchOnlyPairedReadMerger(overlap, 1.0 - 1.0 * maxMuts / overlap, 55, null);
+        merger = new MismatchOnlyPairedReadMerger(overlap, 1.0 - 1.0 * maxMuts / overlap, 55,
+                QualityMergingAlgorithm.SumSubtraction,
+                PairedEndReadsLayout.Unknown);
         processed = merger.process(new PairedRead(
                 new SingleReadImpl(0, new NSequenceWithQuality(seq1, lets('A', seq1.length())), "A"),
                 new SingleReadImpl(0, new NSequenceWithQuality(seq2, lets('B', seq2.length())).getReverseComplement(), "B")));

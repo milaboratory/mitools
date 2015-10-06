@@ -16,6 +16,7 @@
 package com.milaboratory.mitools.merger;
 
 import cc.redberry.pipe.Processor;
+import com.milaboratory.core.PairedEndReadsLayout;
 import com.milaboratory.core.io.sequence.PairedRead;
 import com.milaboratory.core.motif.BitapMatcher;
 import com.milaboratory.core.motif.BitapPattern;
@@ -31,7 +32,7 @@ import static java.lang.Math.*;
 
 public final class MismatchOnlyPairedReadMerger implements Processor<PairedRead, PairedReadMergingResult>,
         java.io.Serializable {
-    public static final int DEFAULT_MAX_SCORE_VALUE = 50;
+    public static final int MIN_SCORE_VALUE = 3; // 50-50
     final int minOverlap;
     final double maxMismatchesPart;
     final int maxScoreValue;
@@ -39,16 +40,8 @@ public final class MismatchOnlyPairedReadMerger implements Processor<PairedRead,
     final boolean[] strands;
     final int motifLength;
     final int maxMismatchesInMotif;
-
-    /**
-     * Creates paired-end reads merger for Illumina (or other opposite reads) data.
-     *
-     * @param minOverlap      minimal number of nucleotide in overlap region
-     * @param minimalIdentity maximal allowed percent of mismatches in overlap region
-     */
-    public MismatchOnlyPairedReadMerger(int minOverlap, double minimalIdentity) {
-        this(minOverlap, minimalIdentity, DEFAULT_MAX_SCORE_VALUE, true);
-    }
+    final QualityMergingAlgorithm qualityMergingAlgorithm;
+    final PairedEndReadsLayout pairedEndReadsLayout;
 
     /**
      * Creates paired-end reads merger for Illumina (or other opposite reads) data.
@@ -56,54 +49,29 @@ public final class MismatchOnlyPairedReadMerger implements Processor<PairedRead,
      * @param parameters merger parameters
      */
     public MismatchOnlyPairedReadMerger(MergerParameters parameters) {
-        this(parameters.getMinimalOverlap(), parameters.getMinimalIdentity(), DEFAULT_MAX_SCORE_VALUE, true);
-    }
-
-    /**
-     * Creates paired-end reads merger for Illumina (or other opposite reads) data.
-     *
-     * @param parameters merger parameters
-     * @param isOpposite is opposite
-     */
-    public MismatchOnlyPairedReadMerger(MergerParameters parameters, Boolean isOpposite) {
-        this(parameters.getMinimalOverlap(), parameters.getMinimalIdentity(), DEFAULT_MAX_SCORE_VALUE, isOpposite);
-    }
-
-    /**
-     * Creates paired-end reads merger for Illumina (or other opposite reads) data.
-     *
-     * @param minOverlap      minimal number of nucleotide in overlap region
-     * @param minimalIdentity maximal allowed percent of mismatches in overlap region
-     * @param maxScoreValue   maximal output quality score value
-     */
-    public MismatchOnlyPairedReadMerger(int minOverlap, double minimalIdentity, int maxScoreValue) {
-        this(minOverlap, minimalIdentity, maxScoreValue, true);
-    }
-
-    /**
-     * Creates paired-end reads merger for Illumina (or other opposite reads) data.
-     *
-     * @param parameters    merger parameters
-     * @param maxScoreValue maximal output quality score value
-     */
-    public MismatchOnlyPairedReadMerger(MergerParameters parameters, int maxScoreValue) {
-        this(parameters.getMinimalOverlap(), parameters.getMinimalIdentity(), maxScoreValue, true);
+        this(parameters.getMinimalOverlap(), parameters.getMinimalIdentity(), parameters.getMaxQuality(),
+                parameters.qualityMergingAlgorithm, parameters.getPartsLayout());
     }
 
     /**
      * Creates paired-end reads merger.
      *
-     * @param minOverlap      minimal number of nucleotide in overlap region
-     * @param minimalIdentity maximal allowed percent of mismatches in overlap region
-     * @param maxScoreValue   maximal output quality score value
-     * @param isOpposite      {@code true} if reads are on different strands, like Illumina reads
+     * @param minOverlap              minimal number of nucleotide in overlap region
+     * @param minimalIdentity         maximal allowed percent of mismatches in overlap region
+     * @param maxScoreValue           maximal output quality score value
+     * @param qualityMergingAlgorithm algorithm to infer quality of merged reads from it's pairs
+     * @param pairedEndReadsLayout    orientation of read pairs
      */
-    public MismatchOnlyPairedReadMerger(int minOverlap, double minimalIdentity, int maxScoreValue, Boolean isOpposite) {
+    public MismatchOnlyPairedReadMerger(int minOverlap, double minimalIdentity, int maxScoreValue,
+                                        QualityMergingAlgorithm qualityMergingAlgorithm,
+                                        PairedEndReadsLayout pairedEndReadsLayout) {
+        if (qualityMergingAlgorithm == null || pairedEndReadsLayout == null)
+            throw new NullPointerException();
+        this.qualityMergingAlgorithm = qualityMergingAlgorithm;
+        this.pairedEndReadsLayout = pairedEndReadsLayout;
         this.minOverlap = minOverlap;
         this.maxMismatchesPart = 1.0 - minimalIdentity;
-        this.strands = isOpposite == null ?
-                new boolean[]{false, true} :
-                new boolean[]{isOpposite};
+        this.strands = pairedEndReadsLayout.getPossibleRelativeStrands();
         this.maxScoreValue = maxScoreValue;
 
         // Calculating length fo motif to be used in Bitap search.
@@ -229,10 +197,22 @@ public final class MismatchOnlyPairedReadMerger implements Processor<PairedRead,
                     quality = q;
                 } else if (letter == l)
                     quality = (byte) min(maxScoreValue, quality + q);
-                else if (q > quality) {
-                    letter = l;
-                    quality = q;
-                }
+                else
+                    switch (qualityMergingAlgorithm) {
+                        case SumSubtraction:
+                            if (q > quality) {
+                                letter = l;
+                                quality = (byte) max(MIN_SCORE_VALUE, q - quality);
+                            } else
+                                quality = (byte) max(MIN_SCORE_VALUE, quality - q);
+                            break;
+                        case SumMax:
+                            if (q > quality) {
+                                letter = l;
+                                quality = q;
+                            }
+                            break;
+                    }
             }
 
             assert letter != -1;

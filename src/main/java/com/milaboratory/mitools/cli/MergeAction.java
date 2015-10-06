@@ -23,12 +23,15 @@ import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
 import com.beust.jcommander.Parameters;
 import com.beust.jcommander.validators.PositiveInteger;
+import com.milaboratory.core.PairedEndReadsLayout;
 import com.milaboratory.core.io.sequence.PairedRead;
 import com.milaboratory.core.io.sequence.SingleReadImpl;
 import com.milaboratory.core.io.sequence.fastq.PairedFastqReader;
 import com.milaboratory.core.io.sequence.fastq.SingleFastqWriter;
+import com.milaboratory.mitools.merger.MergerParameters;
 import com.milaboratory.mitools.merger.MismatchOnlyPairedReadMerger;
 import com.milaboratory.mitools.merger.PairedReadMergingResult;
+import com.milaboratory.mitools.merger.QualityMergingAlgorithm;
 import com.milaboratory.util.SmartProgressReporter;
 
 import java.io.File;
@@ -45,9 +48,12 @@ public class MergeAction implements Action {
 
     @Override
     public void go(ActionHelper helper) throws Exception {
-        final MismatchOnlyPairedReadMerger merger = new MismatchOnlyPairedReadMerger(actionParameters.overlap,
-                actionParameters.similarity, MismatchOnlyPairedReadMerger.DEFAULT_MAX_SCORE_VALUE,
-                !actionParameters.sameStrand);
+        final MismatchOnlyPairedReadMerger merger = new MismatchOnlyPairedReadMerger(
+                actionParameters.overlap,
+                actionParameters.similarity, actionParameters.maxQuality,
+                actionParameters.getQualityMergingAlgorithm(),
+                actionParameters.sameStrand ? PairedEndReadsLayout.Collinear :
+                        PairedEndReadsLayout.Opposite);
 
         long total = 0, overlapped = 0;
         try (PairedFastqReader reader = new PairedFastqReader(actionParameters.getR1(), actionParameters.getR2());
@@ -156,6 +162,11 @@ public class MergeAction implements Action {
                 names = {"-ss", "--same-strand"})
         boolean sameStrand;
 
+        @Parameter(description = "Possible values: 'max' - take maximal score value in letter conflicts, 'sub' - " +
+                "subtract minimal quality from maximal",
+                names = {"-q", "--quality-merging-algorithm"})
+        String qualityMergingAlgorithm = QualityMergingAlgorithm.SumSubtraction.cliName;
+
         @Parameter(description = "Minimal overlap.",
                 names = {"-p", "--overlap"}, validateWith = PositiveInteger.class)
         int overlap = 15;
@@ -163,6 +174,10 @@ public class MergeAction implements Action {
         @Parameter(description = "Minimal allowed similarity",
                 names = {"-s", "--similarity"})
         double similarity = 0.85;
+
+        @Parameter(description = "Maximal quality to set for letters within overlap.",
+                names = {"-m", "--max-quality"})
+        int maxQuality = MergerParameters.DEFAULT_MAX_QUALITY_VALUE;
 
         @Parameter(description = "Threads",
                 names = {"-t", "--threads"}, validateWith = PositiveInteger.class)
@@ -178,6 +193,10 @@ public class MergeAction implements Action {
 
         public String getOutput() {
             return parameters.size() == 2 ? "-" : parameters.get(2);
+        }
+
+        public QualityMergingAlgorithm getQualityMergingAlgorithm() {
+            return QualityMergingAlgorithm.getFromCLIName(qualityMergingAlgorithm);
         }
 
         @Override
