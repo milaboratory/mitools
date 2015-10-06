@@ -1,4 +1,11 @@
 
+MiTools 1.1.2 ( 6 Oct 2015)
+========================
+
+-- Added `--max-quality` for merger
+-- Implemented different quality merging algorithms
+
+
 MiTools 1.1.1 (11 Sep 2015)
 ========================
 
