@@ -1,0 +1,2 @@
+Added `--max-quality` for merger
+Implemented different quality merging algorithms
