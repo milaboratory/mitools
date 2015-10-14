@@ -21,7 +21,8 @@ public class Main {
                 new MergeAction(),
                 new TrimAction(),
                 new RCAction(),
-                new RenameAction());
+                new RenameAction(),
+                new SplitAction());
         main.main(args);
     }
 }
