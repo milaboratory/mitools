@@ -189,5 +189,4 @@ public class SplitAction implements Action {
                 throw new ParameterException("Output file name doesn't contain \"{R}\" while paired-end input is used.");
         }
     }
-
 }

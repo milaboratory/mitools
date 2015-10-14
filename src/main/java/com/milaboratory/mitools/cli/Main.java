@@ -22,7 +22,8 @@ public class Main {
                 new TrimAction(),
                 new RCAction(),
                 new RenameAction(),
-                new SplitAction());
+                new SplitAction(),
+                new CheckAction());
         main.main(args);
     }
 }
