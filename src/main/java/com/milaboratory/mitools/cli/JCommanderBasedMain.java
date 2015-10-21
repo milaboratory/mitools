@@ -30,6 +30,7 @@ public class JCommanderBasedMain implements ActionHelper {
     protected final String command;
     protected boolean printHelpOnError = false;
     protected boolean printStackTrace = false;
+    protected Runnable versionInfoCallback = null;
     protected PrintStream outputStream = System.err;
     protected String[] arguments;
 
@@ -81,7 +82,7 @@ public class JCommanderBasedMain implements ActionHelper {
         }
 
         // Setting up JCommander
-        MainParameters mainParameters = new MainParameters();
+        MainParameters mainParameters = getMainParameters();
         JCommander commander = new JCommander(mainParameters);
         commander.setProgramName(command);
         for (Action a : actions.values())
@@ -98,6 +99,13 @@ public class JCommanderBasedMain implements ActionHelper {
                 ((ActionParametersParser) action).parseParameters(Arrays.copyOfRange(args, 1, args.length));
             } else {
                 commander.parse(args);
+
+                // Print Version information if requested and exit.
+                if (mainParameters instanceof MainParametersWithVersion &&
+                        ((MainParametersWithVersion) mainParameters).version()) {
+                    versionInfoCallback.run();
+                    return;
+                }
 
                 // Print complete help if requested
                 if (mainParameters.help()) {
@@ -141,9 +149,15 @@ public class JCommanderBasedMain implements ActionHelper {
         }
     }
 
+    private MainParameters getMainParameters() {
+        return versionInfoCallback != null ?
+                new MainParametersWithVersion() :
+                new MainParameters();
+    }
+
     protected void printGlobalHelp() {
         // Creating new instance of jCommander to add only non-hidden actions
-        JCommander tmpCommander = new JCommander(new MainParameters());
+        JCommander tmpCommander = new JCommander(getMainParameters());
         tmpCommander.setProgramName(command);
         for (Action a : actions.values())
             if (!a.getClass().isAnnotationPresent(HiddenAction.class))
@@ -171,12 +185,35 @@ public class JCommanderBasedMain implements ActionHelper {
             printActionHelp(commander, action);
     }
 
-    public static final class MainParameters {
+    /**
+     * Enables -v / --version parameter.
+     *
+     * Sets callback that will be invoked if this option is specified by user.
+     *
+     * {@literal null} disables -v parameter.
+     *
+     * @param versionInfoCallback callback to be will be invoked if user specified -v option. {@literal null} disables
+     *                            -v parameter.
+     */
+    public void setVersionInfoCallback(Runnable versionInfoCallback) {
+        this.versionInfoCallback = versionInfoCallback;
+    }
+
+    public static class MainParameters {
         @Parameter(names = {"-h", "--help"}, help = true, description = "Displays this help message.")
         public Boolean help;
 
         public boolean help() {
             return help != null && help;
+        }
+    }
+
+    public static class MainParametersWithVersion extends MainParameters {
+        @Parameter(names = {"-v", "--version"}, help = true, description = "Output version information.")
+        public Boolean version;
+
+        public boolean version() {
+            return version != null && version;
         }
     }
 }
