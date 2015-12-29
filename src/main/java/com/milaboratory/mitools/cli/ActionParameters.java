@@ -19,7 +19,7 @@ import com.beust.jcommander.Parameter;
 
 public abstract class ActionParameters {
     @Parameter(names = {"-h", "--help"}, help = true, description = "Displays help for this command.")
-    public Boolean help;
+    public Boolean help = false;
 
     public boolean help() {
         return help != null && help;
