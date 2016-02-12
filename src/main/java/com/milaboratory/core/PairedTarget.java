@@ -17,13 +17,40 @@ package com.milaboratory.core;
 
 import com.milaboratory.core.sequence.NSequenceWithQuality;
 
-/**
- * Created by dbolotin on 24/07/14.
- */
 public final class PairedTarget {
     public final NSequenceWithQuality[] targets;
+    /**
+     * -2 for RC R2
+     * -1 for RC R1
+     * +1 for Direct R1
+     * +2 for Direct R2
+     */
+    private final byte[] readIds;
 
-    PairedTarget(NSequenceWithQuality... targets) {
-        this.targets = targets;
+    PairedTarget(NSequenceWithQuality target1, NSequenceWithQuality target2, byte[] readIds) {
+        this.targets = new NSequenceWithQuality[]{target1, target2};
+        this.readIds = readIds;
+    }
+
+    /**
+     * @param targetId 0 or 1
+     * @return 0 for R1, 1 for R2
+     */
+    public int getReadIdOfTarget(int targetId) {
+        return Math.abs(readIds[targetId]) - 1;
+    }
+
+    /**
+     * {@literal true} for RC, {@literal false} for Direct
+     *
+     * @param targetId 0 or 1
+     * @return {@literal true} for RC, {@literal false} for Direct
+     */
+    public boolean getRCStateOfTarget(int targetId) {
+        return readIds[targetId] < 0;
+    }
+
+    public byte getFullSourceId(int targetId) {
+        return readIds[targetId];
     }
 }
