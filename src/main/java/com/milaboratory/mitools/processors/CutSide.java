@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 MiLaboratory.com
+ * Copyright 2016 MiLaboratory.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,18 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.milaboratory.mitools.cli;
+package com.milaboratory.mitools.processors;
 
-public class Main {
-    public static void main(String[] args) throws Exception {
-        JCommanderBasedMain main = new JCommanderBasedMain("mitools",
-                new MergeAction(),
-                new TrimAction(),
-                new RCAction(),
-                new RenameAction(),
-                new SplitAction(),
-                new CheckAction(),
-                new CutAction());
-        main.main(args);
-    }
+/**
+ * Created by dbolotin on 10/03/16.
+ */
+public enum CutSide {
+    Left, Center, Right
 }

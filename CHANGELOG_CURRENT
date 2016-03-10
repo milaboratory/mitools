@@ -1,0 +1,1 @@
+added new action: `mitools cut` to cut sequences to a fixed or random length (see help `mitools cut -h`)
