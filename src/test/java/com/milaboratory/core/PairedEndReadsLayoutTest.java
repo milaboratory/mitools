@@ -32,7 +32,7 @@ public class PairedEndReadsLayoutTest {
                 new SingleReadImpl(0, r2, "R2")
         );
 
-        PairedTarget[] targets = PairedEndReadsLayout.ReverseOnly.createTargets(pr);
+        Target[] targets = PairedEndReadsLayout.ReverseOnly.createTargets(pr);
         Assert.assertEquals(1, targets.length);
         Assert.assertEquals(r2, targets[0].targets[0]);
         Assert.assertEquals(r1.getReverseComplement(), targets[0].targets[1]);

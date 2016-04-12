@@ -17,7 +17,9 @@ package com.milaboratory.core;
 
 import com.milaboratory.core.sequence.NSequenceWithQuality;
 
-public final class PairedTarget {
+public final class Target {
+    private static final byte[] SINGLE_FORWARD = new byte[]{+1};
+    private static final byte[] SINGLE_REVERSED = new byte[]{-1};
     public final NSequenceWithQuality[] targets;
     /**
      * -2 for RC R2
@@ -27,9 +29,21 @@ public final class PairedTarget {
      */
     private final byte[] readIds;
 
-    PairedTarget(NSequenceWithQuality target1, NSequenceWithQuality target2, byte[] readIds) {
+    Target(NSequenceWithQuality target, boolean reversed) {
+        this.targets = new NSequenceWithQuality[]{target};
+        this.readIds = reversed ? SINGLE_REVERSED : SINGLE_FORWARD;
+    }
+
+    Target(NSequenceWithQuality target1, NSequenceWithQuality target2, byte[] readIds) {
         this.targets = new NSequenceWithQuality[]{target1, target2};
         this.readIds = readIds;
+    }
+
+    /**
+     * 1 for SingleRead input or 2 for PairedRead input
+     */
+    public int numberOfParts() {
+        return readIds.length;
     }
 
     /**

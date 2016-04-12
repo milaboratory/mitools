@@ -16,6 +16,8 @@
 package com.milaboratory.core;
 
 import com.milaboratory.core.io.sequence.PairedRead;
+import com.milaboratory.core.io.sequence.SequenceRead;
+import com.milaboratory.core.io.sequence.SingleRead;
 import com.milaboratory.core.sequence.NSequenceWithQuality;
 
 public enum PairedEndReadsLayout implements java.io.Serializable {
@@ -25,6 +27,7 @@ public enum PairedEndReadsLayout implements java.io.Serializable {
      */
     DirectOnly(new PairedTargetProvider(
             +1, -2),
+            new SingleTargetProvider(false),
             true),
     /**
      * R2     R1
@@ -32,6 +35,7 @@ public enum PairedEndReadsLayout implements java.io.Serializable {
      */
     ReverseOnly(new PairedTargetProvider(
             +2, -1),
+            new SingleTargetProvider(true),
             true),
     /**
      * R1     R2
@@ -43,6 +47,7 @@ public enum PairedEndReadsLayout implements java.io.Serializable {
     Opposite(new PairedTargetProvider(
             +1, -2,
             +2, -1),
+            new SingleTargetProvider(false, true),
             true),
     /**
      * R1     R2
@@ -54,6 +59,7 @@ public enum PairedEndReadsLayout implements java.io.Serializable {
     Collinear(new PairedTargetProvider(
             +1, +2,
             -2, -1),
+            new SingleTargetProvider(false, true),
             false),
     /**
      * R1     R2
@@ -73,8 +79,10 @@ public enum PairedEndReadsLayout implements java.io.Serializable {
             +2, -1,
             +1, +2,
             -2, -1),
+            new SingleTargetProvider(false, true),
             false, true);
-    private final PairedTargetProvider provider;
+    private final PairedTargetProvider pairedProvider;
+    private final SingleTargetProvider singleProvider;
     /**
      * Determines possible relative (R1 relative to R2) strands. (true for RC; false for same strand)
      *
@@ -82,13 +90,28 @@ public enum PairedEndReadsLayout implements java.io.Serializable {
      */
     private final boolean[] possibleRelativeStrands;
 
-    PairedEndReadsLayout(PairedTargetProvider provider, boolean... possibleRelativeStrands) {
-        this.provider = provider;
+    PairedEndReadsLayout(PairedTargetProvider pairedProvider,
+                         SingleTargetProvider singleProvider,
+                         boolean... possibleRelativeStrands) {
+        this.pairedProvider = pairedProvider;
+        this.singleProvider = singleProvider;
         this.possibleRelativeStrands = possibleRelativeStrands;
     }
 
-    public PairedTarget[] createTargets(PairedRead read) {
-        return provider.createTargets(read);
+    public Target[] createTargets(PairedRead read) {
+        return pairedProvider.createTargets(read);
+    }
+
+    public Target[] createTargets(SingleRead read) {
+        return singleProvider.createTargets(read);
+    }
+
+    public Target[] createTargets(SequenceRead read) {
+        if (read instanceof PairedRead)
+            return pairedProvider.createTargets((PairedRead) read);
+        if (read instanceof SingleRead)
+            return singleProvider.createTargets((SingleRead) read);
+        throw new IllegalArgumentException("Unknown read type.");
     }
 
     /**
@@ -98,6 +121,24 @@ public enum PairedEndReadsLayout implements java.io.Serializable {
      */
     public boolean[] getPossibleRelativeStrands() {
         return possibleRelativeStrands;
+    }
+
+    private static final class SingleTargetProvider {
+        final boolean[] states;
+
+        public SingleTargetProvider(boolean... states) {
+            this.states = states;
+        }
+
+        Target[] createTargets(SingleRead read) {
+            Target[] ts = new Target[states.length];
+            int i = 0;
+            for (boolean state : states)
+                ts[i++] = new Target(state ?
+                        read.getData().getReverseComplement() :
+                        read.getData(), state);
+            return ts;
+        }
     }
 
     private static final class PairedTargetProvider {
@@ -111,11 +152,11 @@ public enum PairedEndReadsLayout implements java.io.Serializable {
             }
         }
 
-        PairedTarget[] createTargets(PairedRead read) {
-            final PairedTarget[] result = new PairedTarget[ids.length];
+        Target[] createTargets(PairedRead read) {
+            final Target[] result = new Target[ids.length];
             for (int i = 0; i < ids.length; i++) {
                 byte[] ii = ids[i];
-                result[i] = new PairedTarget(dataFromId(read, ii[0]),
+                result[i] = new Target(dataFromId(read, ii[0]),
                         dataFromId(read, ii[1]), ii);
             }
             return result;
@@ -135,8 +176,4 @@ public enum PairedEndReadsLayout implements java.io.Serializable {
             throw new IllegalArgumentException();
         }
     }
-
-    //private interface SingleTargetProvider {
-    //    SingleTarget[] createTargets(SingleRead read);
-    //}
 }
