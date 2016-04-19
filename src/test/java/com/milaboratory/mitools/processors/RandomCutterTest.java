@@ -28,7 +28,7 @@ import org.junit.Test;
 public class RandomCutterTest {
     @Test
     public void test1() throws Exception {
-        RandomCutter cutter = new RandomCutter(CutSide.Center, 10, 20);
+        RandomCutter cutter = new RandomCutter(CutSide.Random, 10, 20);
         SingleReadImpl read = new SingleReadImpl(1, new NSequenceWithQuality("ATTAGACA"), "Hi!");
         SingleRead processed = cutter.process(read);
         Assert.assertEquals(processed, read);

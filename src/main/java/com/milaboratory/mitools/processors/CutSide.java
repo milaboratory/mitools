@@ -15,9 +15,6 @@
  */
 package com.milaboratory.mitools.processors;
 
-/**
- * Created by dbolotin on 10/03/16.
- */
 public enum CutSide {
-    Left, Center, Right
+    Left, Random, Right
 }

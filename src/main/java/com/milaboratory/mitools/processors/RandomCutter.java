@@ -67,7 +67,7 @@ public final class RandomCutter implements Processor<SingleRead, SingleRead> {
             case Right:
                 startPosition = input.getData().size() - length;
                 break;
-            case Center:
+            case Random:
                 startPosition = length == input.getData().size() ? 0 : rnd.nextInt(input.getData().size() - length + 1);
                 break;
             default:

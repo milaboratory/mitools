@@ -77,7 +77,7 @@ public class CutAction implements Action {
                 names = {"-bl", "--max-length"})
         Integer maxLength;
 
-        @Parameter(description = "Position to cut from. (possible values 'Left', 'Right', 'Center')",
+        @Parameter(description = "Position to cut from. (possible values 'Left', 'Right', 'Random')",
                 names = {"-p", "--position"})
         String position = "Left";
 
