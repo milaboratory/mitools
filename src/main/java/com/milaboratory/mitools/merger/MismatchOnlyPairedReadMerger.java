@@ -129,7 +129,8 @@ public final class MismatchOnlyPairedReadMerger implements Processor<PairedRead,
                         read1.getSequence(), matchPosition,
                         read2.getSequence(), 0,
                         overlap)) <= overlap * maxMismatchesPart) {
-                    tmp = new PairedReadMergingResult(pairedRead, overlap(read1, read2, matchPosition),
+                    tmp = new PairedReadMergingResult(pairedRead, overlap(read1, read2, matchPosition,
+                            maxScoreValue, qualityMergingAlgorithm),
                             overlap, mismatches);
                     break;
                 }
@@ -141,7 +142,8 @@ public final class MismatchOnlyPairedReadMerger implements Processor<PairedRead,
                         read1.getSequence(), matchPosition - overlap,
                         read2.getSequence(), max(0, read2.size() - overlap),
                         overlap)) <= overlap * maxMismatchesPart) {
-                    tmp = new PairedReadMergingResult(pairedRead, overlap(read1, read2, min(matchPosition - read2.size(), 0)),
+                    tmp = new PairedReadMergingResult(pairedRead, overlap(read1, read2, min(matchPosition - read2.size(), 0),
+                            maxScoreValue, qualityMergingAlgorithm),
                             overlap, mismatches);
                     break;
                 }
@@ -162,7 +164,8 @@ public final class MismatchOnlyPairedReadMerger implements Processor<PairedRead,
      * @param offset position of first nucleotide of seq2 in seq1
      * @return overlapped sequence
      */
-    private NSequenceWithQuality overlap(NSequenceWithQuality seq1, NSequenceWithQuality seq2, int offset) {
+    public static NSequenceWithQuality overlap(NSequenceWithQuality seq1, NSequenceWithQuality seq2, int offset,
+                                               int maxScoreValue, QualityMergingAlgorithm qualityMergingAlgorithm) {
         // Calculating length of resulting sequence
         int length = abs(offset) +
                 (offset >= 0 ?
