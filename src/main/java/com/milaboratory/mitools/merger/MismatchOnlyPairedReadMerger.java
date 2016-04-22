@@ -166,6 +166,9 @@ public final class MismatchOnlyPairedReadMerger implements Processor<PairedRead,
      */
     public static NSequenceWithQuality overlap(NSequenceWithQuality seq1, NSequenceWithQuality seq2, int offset,
                                                int maxScoreValue, QualityMergingAlgorithm qualityMergingAlgorithm) {
+        if (qualityMergingAlgorithm == null)
+            throw new NullPointerException();
+
         // Calculating length of resulting sequence
         int length = abs(offset) +
                 (offset >= 0 ?
