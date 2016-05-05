@@ -75,7 +75,7 @@ public class PairedReadMergingResult implements java.io.Serializable {
         return errors;
     }
 
-    int score() {
+    public int score() {
         return (overlap - errors) * MATCH_SCORE + errors * MISMATCH_SCORE;
     }
 

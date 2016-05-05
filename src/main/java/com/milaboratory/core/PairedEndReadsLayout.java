@@ -63,6 +63,14 @@ public enum PairedEndReadsLayout implements java.io.Serializable {
             false),
     /**
      * R1     R2
+     * ---> --->
+     */
+    CollinearDirect(new PairedTargetProvider(
+            +1, +2),
+            new SingleTargetProvider(false),
+            false),
+    /**
+     * R1     R2
      * ---> <---
      * +
      * R2     R1

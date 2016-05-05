@@ -79,11 +79,12 @@ public final class MismatchOnlyPairedReadMerger implements Processor<PairedRead,
         this.maxMismatchesInMotif = (int) round(motifLength * maxMismatchesPart);
     }
 
-    @Override
-    public PairedReadMergingResult process(PairedRead pairedRead) {
-        NSequenceWithQuality read1p = pairedRead.getR1().getData();
-        NSequenceWithQuality read2p = pairedRead.getR2().getData();
+    public PairedReadMergingResult merge(NSequenceWithQuality read1p, NSequenceWithQuality read2p) {
+        return merge(read1p, read2p, null);
+    }
 
+    public PairedReadMergingResult merge(NSequenceWithQuality read1p, NSequenceWithQuality read2p,
+                                         PairedRead pairedRead) {
         // If there is no sufficient letters in one of read overlapping is impossible
         if (read1p.size() < minOverlap || read2p.size() < minOverlap)
             // Return failed result
@@ -129,8 +130,7 @@ public final class MismatchOnlyPairedReadMerger implements Processor<PairedRead,
                         read1.getSequence(), matchPosition,
                         read2.getSequence(), 0,
                         overlap)) <= overlap * maxMismatchesPart) {
-                    tmp = new PairedReadMergingResult(pairedRead, overlap(read1, read2, matchPosition,
-                            maxScoreValue, qualityMergingAlgorithm),
+                    tmp = new PairedReadMergingResult(pairedRead, overlap(read1, read2, matchPosition),
                             overlap, mismatches);
                     break;
                 }
@@ -142,8 +142,7 @@ public final class MismatchOnlyPairedReadMerger implements Processor<PairedRead,
                         read1.getSequence(), matchPosition - overlap,
                         read2.getSequence(), max(0, read2.size() - overlap),
                         overlap)) <= overlap * maxMismatchesPart) {
-                    tmp = new PairedReadMergingResult(pairedRead, overlap(read1, read2, min(matchPosition - read2.size(), 0),
-                            maxScoreValue, qualityMergingAlgorithm),
+                    tmp = new PairedReadMergingResult(pairedRead, overlap(read1, read2, min(matchPosition - read2.size(), 0)),
                             overlap, mismatches);
                     break;
                 }
@@ -158,14 +157,20 @@ public final class MismatchOnlyPairedReadMerger implements Processor<PairedRead,
             return ret;
     }
 
+    @Override
+    public PairedReadMergingResult process(PairedRead pairedRead) {
+        NSequenceWithQuality read1p = pairedRead.getR1().getData();
+        NSequenceWithQuality read2p = pairedRead.getR2().getData();
+        return merge(read1p, read2p, pairedRead);
+    }
+
     /**
      * @param seq1   sequence 1
      * @param seq2   sequence 2
      * @param offset position of first nucleotide of seq2 in seq1
      * @return overlapped sequence
      */
-    public static NSequenceWithQuality overlap(NSequenceWithQuality seq1, NSequenceWithQuality seq2, int offset,
-                                               int maxScoreValue, QualityMergingAlgorithm qualityMergingAlgorithm) {
+    public NSequenceWithQuality overlap(NSequenceWithQuality seq1, NSequenceWithQuality seq2, int offset) {
         if (qualityMergingAlgorithm == null)
             throw new NullPointerException();
 
