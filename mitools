@@ -88,7 +88,7 @@ do
             shift
             ;;
         *)
-            appArgs+=(${key})
+            appArgs+=("${key}")
             ;;
     esac
 done
