@@ -97,6 +97,12 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>com.beust</groupId>
+            <artifactId>jcommander</artifactId>
+            <version>1.48</version>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
             <groupId>com.milaboratory</groupId>
             <artifactId>milib</artifactId>
             <version>1.0.1</version>
@@ -114,16 +120,6 @@
             <artifactId>mockito-all</artifactId>
             <version>1.9.5</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.beust</groupId>
-            <artifactId>jcommander</artifactId>
-            <version>1.48</version>
-        </dependency>
-        <dependency>
-            <groupId>cc.redberry</groupId>
-            <artifactId>pipe</artifactId>
-            <version>0.9.4</version>
         </dependency>
     </dependencies>
 

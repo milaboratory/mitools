@@ -15,6 +15,8 @@
  */
 package com.milaboratory.mitools.cli;
 
+import com.milaboratory.cli.JCommanderBasedMain;
+
 public class Main {
     public static void main(String[] args) throws Exception {
         JCommanderBasedMain main = new JCommanderBasedMain("mitools",
