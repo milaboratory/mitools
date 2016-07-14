@@ -114,8 +114,8 @@ public class SplitAction implements Action {
     }
 
     @Parameters(commandDescription = "Splits input fastq file(s) into several parts. \"{P}\" in output file name " +
-            "will be substituted with sequential part index, \n\"{R}\" will be substituted with read index (in case " +
-            "of one input file will always be substituted with \"1\").", optionPrefixes = "-")
+            "will be substituted with sequential part index, \"{R}\" will be substituted with read index (in case " +
+            "of one input file will always be substituted with \"1\").")
     public static final class AParameters extends ActionParameters {
         @Parameter(description = "input_file_R1.fastq[.gz] [ input_file_R2.fastq[.gz] ] output_file_part{P}_R{R}.fastq[.gz]",
                 variableArity = true)

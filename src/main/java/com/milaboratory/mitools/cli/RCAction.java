@@ -22,6 +22,7 @@ import com.beust.jcommander.Parameters;
 import com.milaboratory.cli.Action;
 import com.milaboratory.cli.ActionHelper;
 import com.milaboratory.cli.ActionParameters;
+import com.milaboratory.cli.AllowNoArguments;
 import com.milaboratory.core.io.sequence.SingleRead;
 import com.milaboratory.core.io.sequence.SingleReadImpl;
 import com.milaboratory.core.io.sequence.SingleSequenceWriter;
@@ -31,6 +32,7 @@ import com.milaboratory.util.SmartProgressReporter;
 import java.util.ArrayList;
 import java.util.List;
 
+@AllowNoArguments
 public class RCAction implements Action {
     final RCParameters actionParameters = new RCParameters();
 
@@ -56,17 +58,17 @@ public class RCAction implements Action {
         return actionParameters;
     }
 
-    @Parameters(commandDescription = "Reverse complement.", optionPrefixes = "-")
+    @Parameters(commandDescription = "Reverse complement.")
     public static final class RCParameters extends ActionParameters {
         @Parameter(description = "[ input_file_R1.fastq[.gz] [ output_file.fastq[.gz] ] ]", variableArity = true)
         public List<String> parameters = new ArrayList<>();
 
         public String getInput() {
-            return parameters.size() == 0 ? "-" : parameters.get(0);
+            return parameters.size() == 0 ? "." : parameters.get(0);
         }
 
         public String getOutput() {
-            return parameters.size() < 2 ? "-" : parameters.get(1);
+            return parameters.size() < 2 ? "." : parameters.get(1);
         }
 
         @Override

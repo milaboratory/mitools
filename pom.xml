@@ -22,7 +22,7 @@
     <version>1.4-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>MiTools</name>
-    <url>http://milaboratory.com/</url>
+    <url>https://github.com/milaboratory/mitools</url>
 
     <parent>
         <groupId>org.sonatype.oss</groupId>
@@ -94,7 +94,7 @@
         <dependency>
             <groupId>com.milaboratory</groupId>
             <artifactId>milib</artifactId>
-            <version>${project.version}</version>
+            <version>1.5-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.beust</groupId>
@@ -130,11 +130,6 @@
     <scm>
         <connection>scm:git:https://github.com/milaboratory/mitools.git</connection>
     </scm>
-
-    <issueManagement>
-        <system>YouTrack</system>
-        <url>http://youtrack.milaboratory.com/</url>
-    </issueManagement>
 
     <profiles>
         <profile>
