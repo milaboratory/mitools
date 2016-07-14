@@ -15,15 +15,58 @@
  */
 package com.milaboratory.mitools.cli;
 
+import com.milaboratory.cli.JCommanderBasedMain;
+import com.milaboratory.util.VersionInfo;
+import sun.misc.Signal;
+import sun.misc.SignalHandler;
+
 public class Main {
     public static void main(String[] args) throws Exception {
+        Signal.handle(new Signal("PIPE"), new SignalHandler() {
+            @Override
+            public void handle(Signal signal) {
+                System.exit(0);
+            }
+        });
+
         JCommanderBasedMain main = new JCommanderBasedMain("mitools",
                 new MergeAction(),
                 new TrimAction(),
                 new RCAction(),
                 new RenameAction(),
                 new SplitAction(),
-                new CheckAction());
+                new CheckAction(),
+                new CutAction());
+
+        main.setVersionInfoCallback(new Runnable() {
+            @Override
+            public void run() {
+                VersionInfo milib = VersionInfo.getVersionInfoForArtifact("milib");
+                VersionInfo mitools = VersionInfo.getVersionInfoForArtifact("mitools");
+
+                StringBuilder builder = new StringBuilder();
+
+                builder.append("MiTools v")
+                        .append(mitools.getVersion())
+                        .append(" (built ")
+                        .append(mitools.getTimestamp())
+                        .append("; rev=")
+                        .append(mitools.getRevision())
+                        .append("; branch=")
+                        .append(mitools.getBranch())
+                        .append(")")
+                        .append("\n");
+
+                builder.append("MiLib v")
+                        .append(milib.getVersion())
+                        .append(" (rev=").append(milib.getRevision())
+                        .append("; branch=").append(milib.getBranch())
+                        .append(")");
+
+                System.out.println(builder.toString());
+            }
+        });
+
         main.main(args);
     }
 }

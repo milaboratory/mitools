@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 MiLaboratory.com
+ * Copyright 2016 MiLaboratory.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,18 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.milaboratory.mitools.cli;
+package com.milaboratory.mitools.processors;
 
-import com.beust.jcommander.Parameter;
-
-public abstract class ActionParameters {
-    @Parameter(names = {"-h", "--help"}, help = true, description = "Displays help for this command.")
-    public Boolean help = false;
-
-    public boolean help() {
-        return help != null && help;
-    }
-
-    public void validate() {
-    }
+public enum CutSide {
+    Left, Random, Right
 }

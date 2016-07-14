@@ -22,6 +22,9 @@ import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
 import com.beust.jcommander.Parameters;
 import com.beust.jcommander.validators.PositiveInteger;
+import com.milaboratory.cli.Action;
+import com.milaboratory.cli.ActionHelper;
+import com.milaboratory.cli.ActionParameters;
 import com.milaboratory.core.io.sequence.SingleRead;
 import com.milaboratory.core.io.sequence.fastq.SingleFastqReader;
 import com.milaboratory.core.io.sequence.fastq.SingleFastqWriter;
@@ -51,8 +54,8 @@ public class TrimAction implements Action {
 
             final Merger<SingleRead> buffered = buffered(stats, 256);
 
-            final SequenceTrimmer trimmer = new SequenceTrimmer(actionParameters.qualutyThreshold,
-                    actionParameters.trimmLeft(), actionParameters.trimmRight());
+            final SequenceTrimmer trimmer = new SequenceTrimmer(actionParameters.qualityThreshold,
+                    actionParameters.trimLeft(), actionParameters.trimRight());
 
             ParallelProcessor<SingleRead, SingleRead> processor =
                     new ParallelProcessor<>(buffered, trimmer, 1024, actionParameters.threads);
@@ -91,20 +94,20 @@ public class TrimAction implements Action {
         return actionParameters;
     }
 
-    @Parameters(commandDescription = "Trim low quality ends of reads.", optionPrefixes = "-")
+    @Parameters(commandDescription = "Trim low quality ends of reads.")
     private final static class TrimParameters extends ActionParameters {
         @Parameter(description = "input_file.fastq[.gz] -|output_file.fastq[.gz]", variableArity = true)
         public List<String> parameters = new ArrayList<>();
 
-        @Parameter(description = "Trim left", names = {"-tl", "--left"})
+        @Parameter(description = "Trim from left side", names = {"-tl", "--left"})
         public Boolean left;
 
-        @Parameter(description = "Trim right", names = {"-tr", "--right"})
+        @Parameter(description = "Trim from right side", names = {"-tr", "--right"})
         public Boolean right;
 
         @Parameter(description = "Quality threshold", names = {"-q", "--quality"},
                 validateWith = PositiveInteger.class)
-        public int qualutyThreshold = 15;
+        public int qualityThreshold = 15;
 
         @Parameter(description = "Length threshold", names = {"-l", "--length"})
         public int length = 10;
@@ -125,11 +128,11 @@ public class TrimAction implements Action {
             return parameters.get(1);
         }
 
-        public boolean trimmLeft() {
+        public boolean trimLeft() {
             return left == null ? false : left;
         }
 
-        public boolean trimmRight() {
+        public boolean trimRight() {
             return right == null ? false : right;
         }
 

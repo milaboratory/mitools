@@ -19,10 +19,10 @@
 
     <groupId>com.milaboratory</groupId>
     <artifactId>mitools</artifactId>
-    <version>1.3</version>
+    <version>1.4</version>
     <packaging>jar</packaging>
     <name>MiTools</name>
-    <url>http://milaboratory.com/</url>
+    <url>https://github.com/milaboratory/mitools</url>
 
     <parent>
         <groupId>org.sonatype.oss</groupId>
@@ -94,7 +94,13 @@
         <dependency>
             <groupId>com.milaboratory</groupId>
             <artifactId>milib</artifactId>
-            <version>${project.version}</version>
+            <version>1.5-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.beust</groupId>
+            <artifactId>jcommander</artifactId>
+            <version>1.48</version>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>com.milaboratory</groupId>
@@ -115,16 +121,6 @@
             <version>1.9.5</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>com.beust</groupId>
-            <artifactId>jcommander</artifactId>
-            <version>1.30</version>
-        </dependency>
-        <dependency>
-            <groupId>cc.redberry</groupId>
-            <artifactId>pipe</artifactId>
-            <version>0.9.4</version>
-        </dependency>
     </dependencies>
 
     <properties>
@@ -134,11 +130,6 @@
     <scm>
         <connection>scm:git:https://github.com/milaboratory/mitools.git</connection>
     </scm>
-
-    <issueManagement>
-        <system>YouTrack</system>
-        <url>http://youtrack.milaboratory.com/</url>
-    </issueManagement>
 
     <profiles>
         <profile>

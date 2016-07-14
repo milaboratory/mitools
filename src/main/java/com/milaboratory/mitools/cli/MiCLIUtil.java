@@ -28,13 +28,13 @@ import java.util.List;
 
 public class MiCLIUtil {
     public static SingleFastqWriter createSingleWriter(String fileName) throws IOException {
-        if (fileName.equals("-"))
+        if (fileName.equals("-") || fileName.equals("."))
             return new SingleFastqWriter(System.out);
         return new SingleFastqWriter(fileName);
     }
 
     public static SingleFastqReader createSingleReader(String fileName, boolean replaceWildcards) throws IOException {
-        if (fileName.equals("-"))
+        if (fileName.equals("-") || fileName.equals("."))
             return new SingleFastqReader(System.in, replaceWildcards);
         return new SingleFastqReader(fileName, replaceWildcards);
     }

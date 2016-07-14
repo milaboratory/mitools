@@ -23,15 +23,18 @@ import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
 import com.beust.jcommander.Parameters;
 import com.beust.jcommander.validators.PositiveInteger;
+import com.milaboratory.cli.Action;
+import com.milaboratory.cli.ActionHelper;
+import com.milaboratory.cli.ActionParameters;
 import com.milaboratory.core.PairedEndReadsLayout;
 import com.milaboratory.core.io.sequence.PairedRead;
 import com.milaboratory.core.io.sequence.SingleReadImpl;
 import com.milaboratory.core.io.sequence.fastq.PairedFastqReader;
 import com.milaboratory.core.io.sequence.fastq.SingleFastqWriter;
-import com.milaboratory.mitools.merger.MergerParameters;
-import com.milaboratory.mitools.merger.MismatchOnlyPairedReadMerger;
-import com.milaboratory.mitools.merger.PairedReadMergingResult;
-import com.milaboratory.mitools.merger.QualityMergingAlgorithm;
+import com.milaboratory.core.merger.MergerParameters;
+import com.milaboratory.core.merger.MismatchOnlyPairedReadMerger;
+import com.milaboratory.core.merger.PairedReadMergingResult;
+import com.milaboratory.core.merger.QualityMergingAlgorithm;
 import com.milaboratory.util.SmartProgressReporter;
 
 import java.io.File;
@@ -144,12 +147,6 @@ public class MergeAction implements Action {
                 names = {"-r", "--report"})
         String report;
 
-        //@Parameter(description = "Output FASTQ file or \"-\" for STDOUT to put non-overlapped " +
-        //        "reverse reads (supported formats: *.fastq and *.fastq.gz).",
-        //        names = {"-o", "--out"},
-        //        required = true)
-        //String output;
-
         @Parameter(description = "Include both paired-end reads for pairs where no overlap was found.",
                 names = {"-i", "--include-non-overlapped"})
         boolean includeNonOverlapped;
@@ -162,10 +159,11 @@ public class MergeAction implements Action {
                 names = {"-ss", "--same-strand"})
         boolean sameStrand;
 
-        @Parameter(description = "Possible values: 'max' - take maximal score value in letter conflicts, 'sub' - " +
-                "subtract minimal quality from maximal",
+        @Parameter(description = "Possible values: SumMax, SumSubtraction, MaxSubtraction, MaxMax. " +
+                "First word (match behaviour): Sum = sum quality values (result is limited by value of -m option); Max = maximal quality. " +
+                "Second word (mismatch behaviour): Max = take maximal score value, Subtraction = subtract minimal quality from maximal.",
                 names = {"-q", "--quality-merging-algorithm"})
-        String qualityMergingAlgorithm = QualityMergingAlgorithm.SumSubtraction.cliName;
+        String qualityMergingAlgorithm = QualityMergingAlgorithm.MaxSubtraction.name();
 
         @Parameter(description = "Minimal overlap.",
                 names = {"-p", "--overlap"}, validateWith = PositiveInteger.class)
@@ -192,7 +190,7 @@ public class MergeAction implements Action {
         }
 
         public String getOutput() {
-            return parameters.size() == 2 ? "-" : parameters.get(2);
+            return parameters.size() == 2 ? "." : parameters.get(2);
         }
 
         public QualityMergingAlgorithm getQualityMergingAlgorithm() {
