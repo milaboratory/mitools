@@ -32,6 +32,7 @@ public class Main {
         JCommanderBasedMain main = new JCommanderBasedMain("mitools",
                 new MergeAction(),
                 new TrimAction(),
+                new RandomizeAction(),
                 new RCAction(),
                 new RenameAction(),
                 new SplitAction(),
