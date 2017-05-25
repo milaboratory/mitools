@@ -48,12 +48,13 @@ public class RandomizeAction implements Action {
 
     @Override
     public void go(ActionHelper helper) throws Exception {
-        try (SequenceReaderCloseable<SequenceRead> reader = parameters.getReader();
-             SequenceWriter<SequenceRead> writer = parameters.getWriter()) {
+        CountingOutputPort<SequenceRead> randomized;
+        long totalReadsCount;
+        try (SequenceReaderCloseable<SequenceRead> reader = parameters.getReader()) {
             SmartProgressReporter.startProgressReport("Randomizing chunks", (CanReportProgress) reader);
             CountingOutputPort<SequenceRead> countingReader = new CountingOutputPort<>(reader);
             File tempFile = TempFileManager.getTempFile();
-            CountingOutputPort<SequenceRead> randomized = new CountingOutputPort<>(
+            randomized = new CountingOutputPort<>(
                     Randomizer.randomize(countingReader, RandomUtil.getThreadLocalRandomData(),
                             1000000, new ObjectSerializer<SequenceRead>() {
                                 @Override
@@ -79,10 +80,14 @@ public class RandomizeAction implements Action {
                                     }, count);
                                 }
                             }, tempFile));
+            totalReadsCount = countingReader.getCount();
+        }
 
-            SmartProgressReporter.startProgressReport("Writing result",
-                    SmartProgressReporter.extractProgress(randomized, countingReader.getCount()));
+        SmartProgressReporter.startProgressReport("Writing result",
+                SmartProgressReporter.extractProgress(randomized, totalReadsCount));
 
+        // Open output file ad write results
+        try (SequenceWriter<SequenceRead> writer = parameters.getWriter()) {
             for (SequenceRead read : CUtils.it(randomized))
                 writer.write(read);
         }
