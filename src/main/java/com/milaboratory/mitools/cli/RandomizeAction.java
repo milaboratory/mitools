@@ -37,6 +37,8 @@ import com.milaboratory.core.io.sequence.fastq.SingleFastqWriter;
 import com.milaboratory.primitivio.PrimitivI;
 import com.milaboratory.primitivio.PrimitivO;
 import com.milaboratory.util.*;
+import org.apache.commons.math3.random.RandomDataGenerator;
+import org.apache.commons.math3.random.Well19937c;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -55,7 +57,7 @@ public class RandomizeAction implements Action {
             CountingOutputPort<SequenceRead> countingReader = new CountingOutputPort<>(reader);
             File tempFile = TempFileManager.getTempFile();
             randomized = new CountingOutputPort<>(
-                    Randomizer.randomize(countingReader, RandomUtil.getThreadLocalRandomData(),
+                    Randomizer.randomize(countingReader, new RandomDataGenerator(new Well19937c(parameters.getSeed())),
                             1000000, new ObjectSerializer<SequenceRead>() {
                                 @Override
                                 public void write(Collection<SequenceRead> data, OutputStream stream) {
@@ -108,6 +110,15 @@ public class RandomizeAction implements Action {
         @Parameter(description = "input_file_R1.fastq[.gz] [input_file_R2.fastq[.gz]] " +
                 "output_file_R1.fastq[.gz] [output_file_R2.fastq[.gz]]", variableArity = true)
         public List<String> parameters = new ArrayList<>();
+
+        @Parameter(description = "Random generator seed (0 to use current time as random seed).", names = {"-s", "--seed"})
+        public Long seed;
+
+        public long getSeed() {
+            if (seed == null)
+                return System.nanoTime();
+            return seed;
+        }
 
         @SuppressWarnings("unchecked")
         public SequenceReaderCloseable<SequenceRead> getReader() throws IOException {
