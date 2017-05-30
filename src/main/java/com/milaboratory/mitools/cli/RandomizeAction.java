@@ -58,7 +58,7 @@ public class RandomizeAction implements Action {
             File tempFile = TempFileManager.getTempFile();
             randomized = new CountingOutputPort<>(
                     Randomizer.randomize(countingReader, new RandomDataGenerator(new Well19937c(parameters.getSeed())),
-                            1000000, new ObjectSerializer<SequenceRead>() {
+                            parameters.chunkSize, new ObjectSerializer<SequenceRead>() {
                                 @Override
                                 public void write(Collection<SequenceRead> data, OutputStream stream) {
                                     try (PrimitivO o = new PrimitivO(new BufferedOutputStream(stream))) {
@@ -113,6 +113,9 @@ public class RandomizeAction implements Action {
 
         @Parameter(description = "Random generator seed (0 to use current time as random seed).", names = {"-s", "--seed"})
         public Long seed;
+
+        @Parameter(description = "Chunk size in number of reads. Consumed memory is proportional to this number.", names = {"-c", "--chunk"})
+        public int chunkSize = 500_000;
 
         public long getSeed() {
             if (seed == null)
