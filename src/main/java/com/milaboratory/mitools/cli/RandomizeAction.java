@@ -17,7 +17,6 @@ package com.milaboratory.mitools.cli;
 
 import cc.redberry.pipe.CUtils;
 import cc.redberry.pipe.OutputPort;
-import cc.redberry.pipe.OutputPortCloseable;
 import cc.redberry.pipe.util.CountLimitingOutputPort;
 import cc.redberry.pipe.util.CountingOutputPort;
 import com.beust.jcommander.Parameter;
@@ -37,10 +36,14 @@ import com.milaboratory.core.io.sequence.fastq.SingleFastqWriter;
 import com.milaboratory.primitivio.PrimitivI;
 import com.milaboratory.primitivio.PrimitivO;
 import com.milaboratory.util.*;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.math3.random.RandomDataGenerator;
 import org.apache.commons.math3.random.Well19937c;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -52,16 +55,24 @@ public class RandomizeAction implements Action {
     public void go(ActionHelper helper) throws Exception {
         CountingOutputPort<SequenceRead> randomized;
         long totalReadsCount;
-        try (SequenceReaderCloseable<SequenceRead> reader = parameters.getReader()) {
+        Path tmp = parameters.getTmpPath();
+        boolean tmpExisted = true;
+        try(SequenceReaderCloseable<SequenceRead> reader = parameters.getReader()) {
+            if (tmp != null && !Files.isDirectory(tmp)) {
+                tmpExisted = false;
+                Files.createDirectory(tmp);
+            }
+
             SmartProgressReporter.startProgressReport("Randomizing chunks", (CanReportProgress) reader);
             CountingOutputPort<SequenceRead> countingReader = new CountingOutputPort<>(reader);
-            File tempFile = TempFileManager.getTempFile();
+
+            File tempFile = tmp == null ? TempFileManager.getTempFile() : TempFileManager.getTempFile(tmp);
             randomized = new CountingOutputPort<>(
                     Randomizer.randomize(countingReader, new RandomDataGenerator(new Well19937c(parameters.getSeed())),
                             parameters.chunkSize, new ObjectSerializer<SequenceRead>() {
                                 @Override
                                 public void write(Collection<SequenceRead> data, OutputStream stream) {
-                                    try (PrimitivO o = new PrimitivO(new BufferedOutputStream(stream))) {
+                                    try(PrimitivO o = new PrimitivO(new BufferedOutputStream(stream))) {
                                         o.writeInt(data.size());
                                         for (SequenceRead el : data)
                                             o.writeObject(el);
@@ -75,7 +86,7 @@ public class RandomizeAction implements Action {
                                     return new CountLimitingOutputPort<>(new OutputPort<SequenceRead>() {
                                         @Override
                                         public SequenceRead take() {
-                                            synchronized (i) {
+                                            synchronized ( i ){
                                                 return i.readObject(SequenceRead.class);
                                             }
                                         }
@@ -89,9 +100,13 @@ public class RandomizeAction implements Action {
                 SmartProgressReporter.extractProgress(randomized, totalReadsCount));
 
         // Open output file ad write results
-        try (SequenceWriter<SequenceRead> writer = parameters.getWriter()) {
+        try(SequenceWriter<SequenceRead> writer = parameters.getWriter()) {
             for (SequenceRead read : CUtils.it(randomized))
                 writer.write(read);
+        } finally {
+            //cleanup after
+            if (tmp != null && !tmpExisted)
+                FileUtils.deleteDirectory(tmp.toFile());
         }
     }
 
@@ -116,6 +131,9 @@ public class RandomizeAction implements Action {
 
         @Parameter(description = "Chunk size in number of reads. Consumed memory is proportional to this number.", names = {"-c", "--chunk"})
         public int chunkSize = 500_000;
+
+        @Parameter(description = "Path to temp directory", names = {"--tmp-dir"})
+        public String tmpDir;
 
         public long getSeed() {
             if (seed == null)
@@ -145,6 +163,12 @@ public class RandomizeAction implements Action {
                 return parameters.subList(1, 2);
             else
                 return parameters.subList(2, 4);
+        }
+
+        private Path getTmpPath() {
+            if (tmpDir == null)
+                return null;
+            return Paths.get(tmpDir);
         }
 
         @Override
