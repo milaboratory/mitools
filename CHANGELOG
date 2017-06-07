@@ -1,4 +1,11 @@
 
+MiTools 1.5 ( 7 Jun 2017)
+========================
+
+-- Memory-efficient `randomize` action for single-end and paired-end fastq files
+-- Build host information now is saved to resulting binary artefact
+
+
 MiTools 1.4 (14 Jul 2016)
 ========================
 
