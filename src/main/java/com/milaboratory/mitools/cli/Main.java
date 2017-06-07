@@ -55,6 +55,8 @@ public class Main {
                         .append(mitools.getRevision())
                         .append("; branch=")
                         .append(mitools.getBranch())
+                        .append("; host=")
+                        .append(mitools.getHost())
                         .append(")")
                         .append("\n");
 
