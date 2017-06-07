@@ -1,5 +1,7 @@
 MiTools
+[![Build Status](https://travis-ci.org/milaboratory/mitools.svg)](https://travis-ci.org/milaboratory/mitools)
 =======
+
 
 MiTools: yet another Next Generation Sequencing (NGS) data processing tool (based on MiLib)
 
