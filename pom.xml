@@ -192,6 +192,7 @@
                 <version>1.8</version>
                 <executions>
                     <execution>
+                        <id>read_hostname</id>
                         <phase>validate</phase>
                         <goals>
                             <goal>run</goal>
@@ -209,6 +210,7 @@
                         </configuration>
                     </execution>
                     <execution>
+                        <id>delete_tokens</id>
                         <phase>process-sources</phase>
                         <goals>
                             <goal>run</goal>
@@ -278,7 +280,7 @@
                     <target>1.7</target>
                 </configuration>
             </plugin>
-            
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
