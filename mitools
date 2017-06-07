@@ -48,9 +48,16 @@ case $os in
         dir=$(dirname "$(readlinkUniversal "$0")")
     ;;
     Linux)
-        rFreeMb=$(free -m | head -n 3 | tail -n 1 | awk '{ print $4 }')
+        rFreeMb=$(free -m | grep Mem | awk '{ print $4 }')
         maxMb=$(($rFreeMb-$delta))
         dir="$(dirname "$(readlink -f "$0")")"
+    ;;
+    FreeBSD)
+        freeBlocks=$(vmstat -s | grep -E 'free$' | awk '{ print $1 }')
+        inactiveBlocks=$(vmstat -s | grep inactive | awk '{ print $1 }')
+        freeMb=$(( ($freeBlocks+$inactiveBlocks)*4096/1048576 ))
+        maxMb=$(($freeMb-$delta))
+        dir=$(dirname "$(readlinkUniversal "$0")")    
     ;;
     *)
        echo "Unknown OS."
@@ -143,4 +150,4 @@ then
     exit 1
 fi
 
-$java -Dapp.path=$dir -Dapp.command=mixcr -XX:+AggressiveOpts "${javaArgs[@]}" -jar $jar "${appArgs[@]}"
+$java -Dapp.path=$dir -Dapp.command=mitools -XX:+AggressiveOpts "${javaArgs[@]}" -jar $jar "${appArgs[@]}"

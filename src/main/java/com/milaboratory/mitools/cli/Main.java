@@ -32,6 +32,7 @@ public class Main {
         JCommanderBasedMain main = new JCommanderBasedMain("mitools",
                 new MergeAction(),
                 new TrimAction(),
+                new RandomizeAction(),
                 new RCAction(),
                 new RenameAction(),
                 new SplitAction(),
@@ -54,6 +55,8 @@ public class Main {
                         .append(mitools.getRevision())
                         .append("; branch=")
                         .append(mitools.getBranch())
+                        .append("; host=")
+                        .append(mitools.getHost())
                         .append(")")
                         .append("\n");
 

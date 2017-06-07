@@ -19,7 +19,7 @@
 
     <groupId>com.milaboratory</groupId>
     <artifactId>mitools</artifactId>
-    <version>1.4</version>
+    <version>1.5</version>
     <packaging>jar</packaging>
     <name>MiTools</name>
     <url>https://github.com/milaboratory/mitools</url>
@@ -30,6 +30,11 @@
         <version>7</version>
         <relativePath/>
     </parent>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <milib.version>1.8</milib.version>
+    </properties>
 
     <description>
         Yet another Java library for Next Generation Sequencing (NGS) data processing.
@@ -42,6 +47,38 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.milaboratory</groupId>
+            <artifactId>milib</artifactId>
+            <version>${milib.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.milaboratory</groupId>
+            <artifactId>milib</artifactId>
+            <version>${milib.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.beust</groupId>
+            <artifactId>jcommander</artifactId>
+            <version>1.48</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.10</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <version>1.9.5</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
     <developers>
         <developer>
@@ -89,43 +126,6 @@
             <url>https://github.com/mikessh</url>
         </developer>
     </developers>
-
-    <dependencies>
-        <dependency>
-            <groupId>com.milaboratory</groupId>
-            <artifactId>milib</artifactId>
-            <version>1.5-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>com.beust</groupId>
-            <artifactId>jcommander</artifactId>
-            <version>1.48</version>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>com.milaboratory</groupId>
-            <artifactId>milib</artifactId>
-            <version>1.0.1</version>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.10</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-all</artifactId>
-            <version>1.9.5</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
-
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
 
     <scm>
         <connection>scm:git:https://github.com/milaboratory/mitools.git</connection>
@@ -186,6 +186,47 @@
     <build>
         <plugins>
             <plugin>
+                <!-- Workaround maven not being able to set a property conditionally -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.8</version>
+                <executions>
+                    <execution>
+                        <id>read_hostname</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <exportAntProperties>true</exportAntProperties>
+                            <target>
+                                <exec executable="hostname" failonerror="false" outputproperty="hostname"/>
+                                <condition property="hostname" value="unknown">
+                                    <not>
+                                        <isset property="hostname"/>
+                                    </not>
+                                </condition>
+                            </target>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>delete_tokens</id>
+                        <phase>process-sources</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <tasks>
+                                <delete>
+                                    <fileset dir="${basedir}/src/main/java/" includes="*.tokens"/>
+                                </delete>
+                            </tasks>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>buildnumber-maven-plugin</artifactId>
                 <version>1.4</version>
@@ -206,6 +247,7 @@
                         <configuration>
                             <properties>
                                 <branch>${scmBranch}</branch>
+                                <host>${hostname}</host>
                             </properties>
                         </configuration>
                     </execution>
@@ -237,27 +279,6 @@
                     <source>1.7</source>
                     <target>1.7</target>
                 </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <version>1.7</version>
-                <executions>
-                    <execution>
-                        <phase>process-sources</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <tasks>
-                                <delete>
-                                    <fileset dir="${basedir}/src/main/java/" includes="*.tokens"/>
-                                </delete>
-                            </tasks>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
 
             <plugin>
