@@ -103,10 +103,6 @@ public class RandomizeAction implements Action {
         try(SequenceWriter<SequenceRead> writer = parameters.getWriter()) {
             for (SequenceRead read : CUtils.it(randomized))
                 writer.write(read);
-        } finally {
-            //cleanup after
-            if (tmp != null && !tmpExisted)
-                FileUtils.deleteDirectory(tmp.toFile());
         }
     }
 
