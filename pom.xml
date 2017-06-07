@@ -208,6 +208,19 @@
                             </target>
                         </configuration>
                     </execution>
+                    <execution>
+                        <phase>process-sources</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <tasks>
+                                <delete>
+                                    <fileset dir="${basedir}/src/main/java/" includes="*.tokens"/>
+                                </delete>
+                            </tasks>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
 
@@ -265,28 +278,7 @@
                     <target>1.7</target>
                 </configuration>
             </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <version>1.7</version>
-                <executions>
-                    <execution>
-                        <phase>process-sources</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <tasks>
-                                <delete>
-                                    <fileset dir="${basedir}/src/main/java/" includes="*.tokens"/>
-                                </delete>
-                            </tasks>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
+            
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
