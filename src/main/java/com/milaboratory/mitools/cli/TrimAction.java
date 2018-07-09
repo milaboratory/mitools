@@ -100,10 +100,10 @@ public class TrimAction implements Action {
         public List<String> parameters = new ArrayList<>();
 
         @Parameter(description = "Trim from left side", names = {"-tl", "--left"})
-        public Boolean left;
+        public boolean left = false;
 
         @Parameter(description = "Trim from right side", names = {"-tr", "--right"})
-        public Boolean right;
+        public boolean right = false;
 
         @Parameter(description = "Quality threshold", names = {"-q", "--quality"},
                 validateWith = PositiveInteger.class)
@@ -129,11 +129,11 @@ public class TrimAction implements Action {
         }
 
         public boolean trimLeft() {
-            return left == null ? false : left;
+            return left;
         }
 
         public boolean trimRight() {
-            return right == null ? false : right;
+            return right;
         }
 
         @Override
